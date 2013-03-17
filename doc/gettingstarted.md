@@ -92,12 +92,12 @@ eJSEngine.SystemDef({
 	name: "Move",
 	cDefs: [ "Position", "Speed" ],
 	init: function( entities, reverseSpeed, Position, Speed ) {
-		// A live view of all the entities that have
-		// the 2 componants (orderless):
-		var lv = entities.liveView( Position, Speed );
-		// A query for specific components from the view:
-		// (Note that the components order is important)
-		var q = lv.query( Speed, Position );
+		// A liveQuery for specific components from the view:
+		// (Note that the order of components is important)
+		var lq = entities.liveQuery( Speed, Position );
+		
+		// Automatically dispose lq when this system is disposed:
+		lq.disposeWith( this );
 		
 		// Set a public function on the system:
 		this.setReverseSpeed = function(reverse) {
@@ -107,11 +107,10 @@ eJSEngine.SystemDef({
 		// Another public function.
 		// This one is required. It is used to execute the system:
 		this.execute = function( elapsed, time ) {
-			// Here we receive the components
-			// in the order we asked in the query.
-			q.each( function( e, speed, pos ) {
-				// e is the entity, which should actually
-				// not be needed by most systems.
+			// Here we receive the components in the order we asked
+			// in the liveQuery constructor.
+			lq.each( function( e, speed, pos ) {
+				// First argument, e, is the entity.
 				var dx = speed.dx * elapsed,
 					dy = speed.dy * elapsed;
 				if( reverseSpeed ) {
@@ -123,13 +122,6 @@ eJSEngine.SystemDef({
 					pos.setPosition( pos.x + dx, pos.y + dy );
 				}
 			});
-		};
-		
-		// Finally let's free the ressources
-		// when we are destroyed:
-		this.onDisposed = function() {
-			q.dispose();
-			lv.dispose();
 		};
 	}
 });
@@ -152,11 +144,12 @@ eJSEngine.SystemDef({
 	init: function( entities, width, height, Position, Speed ) {
 		// Accumulate elapsed time:
 		var timeAcc = 0;
+		
 		this.execute = function( elapsed, time ) {
 			// Note: elapsed is in milliseconds (1 second = 1000 ms).
 			timeAcc += elapsed;
 			// 1 spawn every 2 seconds:
-			if(timeAcc > 2000) {
+			if(timeAcc >= 2000) {
 				var nbSpawns = timeAcc % 2000;
 				timeAcc -= nbSpawns * 2000;
 				while( nbSpaw-- > 0 ) {
@@ -175,24 +168,15 @@ eJSEngine.SystemDef({
 	name: "KillAtEdge",
 	cDefs: [ "Position" ],
 	init: function( entities, width, height, Position ) {
-		// A live view of all the entities that have the component:
-		var lv = entities.liveView( Position );
-		// A query for specific component from the view:
-		var q = lv.query( Position );
+		var lq = entities.liveQuery( Position ).disposeWith( this );
 		
 		this.execute = function( elapsed, time ) {
-			q.each( function( e, pos ) {
+			lq.each( function( e, pos ) {
 				if(pos.x < 0 || pos.x > width ||
 				   pos.y < 0 || pos.y > height) {
 					entities.disposeEntity(e);
 				}
 			});
-		};
-		
-		// Finally let's free the ressources when we are destroyed:
-		this.onDisposed = function() {
-			q.dispose();
-			lv.dispose();
 		};
 	}
 });
