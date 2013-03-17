@@ -9,10 +9,10 @@ Here are the main steps to make a project with entity.JS:
 1. include the scripts: entity.js and any additional library that adds definitions of components and systems.
 1. define your components. What kind of data they will hold.
 1. define your systems. Each system states which components it will use.
-1. Bonus: learn about links to components and entities
 1. create the ES engine.
 1. initialize your systems (optionally grouping your systems into hierarchies).
 1. create entities and components in the engine.
+1. Bonus: learn about links to components and entities
 1. start executing your systems (usually by calling them from a main loop)
 
 Writting the definitions of the components and systems before creating the ES engine makes it easier to reuse them in different projects. You can group definitions of related components and systems in the same .js files.
@@ -198,6 +198,76 @@ eJSEngine.SystemDef({
 });
 ```
 
+
+## Create the ES engine
+
+This is simple:
+
+```JavaScript
+var eJS = window.eJS = window.eJSEngine();
+```
+
+Now `eJS` is a reference to the new engine.
+You can use another name if you want, but I recommend using `eJS`: simple and easy to remember.
+
+
+## Initialize a system
+
+You can pass the additional arguments expected by the system's `init` function. In our case, `reverseSpeed` is set to false at the beginning.
+
+```JavaScript
+var moveSys = eJS.newSystem( "Move", false ),
+	spawnSys = eJS.newSystem( "SpawnRandomMoveables", 200, 200 ),
+	killSys = eJS.newSystem( "KillAtEdge", 200, 200 );
+```
+
+Now you have your systems. You can access their methods, for example:
+
+```JavaScript
+// Reverse all the speeds:
+moveSys.setReverseSpeed( true );
+
+// Execute the system manually:
+moveSys.execute( 0, 0 );
+```
+
+If you have a lot of systems and want to organize them by groups, see here (TODO).
+Also, if you want to make multiple systems of the same kind (for example with different arguments), you can use system tags (TODO).
+
+
+# Create entities and components
+
+Now that you have all your systems ready, it is time to put some entities in our empty engine. Usually the entities come from level datas, save game, online sync with a server, etc.
+
+Since we are not in a system, we have a little bit more work to do to get ready. We need to get the component creators and use the bag with all the entities:
+
+```JavaScript
+// The bag with all the entities of the ES engine:
+var entities = eJS.entities;
+
+// Get the component creators:
+var Position = eJS.componentCreator("Position"),
+	Move = eJS.componentCreator("Move");
+
+// You can create entities in different ways.
+
+// Simple:
+entities.newEntity(Position(10, 10));	// Doesn't move
+entities.newEntity(Position(15, 15), Move(0, 1));	// Moves up
+
+// Flexible:
+var pos = Position(0, 0),
+	move = Move(0, 0);
+pos.setPosition(30, 30);
+move.dx = 1;	// Moves right
+entities.newEntity(move, pos);
+```
+
+Tips:
+- don't keep references to entities or components between function execution. That means, don't keep references to them when you exit the function. (Because a system can destroy them at any time)
+- when you need to keep a reference, use Links as explained in the next part.
+
+
 ## Bonus: links to components and entities
 
 **Why do we need Links ?**  
@@ -260,6 +330,8 @@ eJSEngine.SystemDef({
 		};
 	}
 });
+
+var	followSys = eJS.newSystem( "Follow" );
 ```
 
 Here is how you can use `cLink` and `eLink`:
@@ -284,76 +356,6 @@ entityL.e === -1;	// => true
 posL.dispose();
 entityL.dispose();
 ```
-
-
-## Create the ES engine
-
-This is simple:
-
-```JavaScript
-var eJS = window.eJS = window.eJSEngine();
-```
-
-Now `eJS` is a reference to the new engine.
-You can use another name if you want, but I recommend using `eJS`: simple and easy to remember.
-
-
-## Initialize a system
-
-You can pass the additional arguments expected by the system's `init` function. In our case, `reverseSpeed` is set to false at the beginning.
-
-```JavaScript
-var moveSys = eJS.newSystem( "Move", false ),
-	spawnSys = eJS.newSystem( "SpawnRandomMoveables", 200, 200 ),
-	killSys = eJS.newSystem( "KillAtEdge", 200, 200 ),
-	followSys = eJS.newSystem( "Follow" );
-```
-
-Now you have your systems. You can access their methods, for example:
-
-```JavaScript
-// Reverse all the speeds:
-moveSys.setReverseSpeed( true );
-
-// Execute the system manually:
-moveSys.execute( 0, 0 );
-```
-
-If you have a lot of systems and want to organize them by groups, see here (TODO).
-Also, if you want to make multiple systems of the same kind (for example with different arguments), you can use system tags (TODO).
-
-
-# Create entities and components
-
-Now that you have all your systems ready, it is time to put some entities in our empty engine. Usually the entities come from level datas, save game, online sync with a server, etc.
-
-Since we are not in a system, we have a little bit more work to do to get ready. We need to get the component creators and use the bag with all the entities:
-
-```JavaScript
-// The bag with all the entities of the ES engine:
-var entities = eJS.entities;
-
-// Get the component creators:
-var Position = eJS.componentCreator("Position"),
-	Move = eJS.componentCreator("Move");
-
-// You can create entities in different ways.
-
-// Simple:
-entities.newEntity(Position(10, 10));	// Doesn't move
-entities.newEntity(Position(15, 15), Move(0, 1));	// Moves up
-
-// Flexible:
-var pos = Position(0, 0),
-	move = Move(0, 0);
-pos.setPosition(30, 30);
-move.dx = 1;	// Moves right
-entities.newEntity(move, pos);
-```
-
-Tips:
-- don't keep references to entities or components between function execution. That means, don't keep references to them when you exit the function. (Because a system can destroy them at any time)
-- when you need to keep a reference, use a `Link` (TODO).
 
 
 ## Start execution
