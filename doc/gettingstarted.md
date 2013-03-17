@@ -7,12 +7,13 @@ The only exposed variable is `window.eJSEngine`. It is the constructor that crea
 Here are the main steps to make a project with entity.JS:
 
 1. include the scripts: entity.js and any additional library that adds definitions of components and systems.
-2. define your components. What kind of data they will hold.
-3. define your systems. Each system states which components it will use.
-4. create the ES engine.
-5. initialize your systems (optionally grouping your systems into hierarchies).
-6. create entities and components in the engine.
-7. start executing your systems (usually by calling them from a main loop)
+1. define your components. What kind of data they will hold.
+1. define your systems. Each system states which components it will use.
+1. Bonus: learn about links to components and entities
+1. create the ES engine.
+1. initialize your systems (optionally grouping your systems into hierarchies).
+1. create entities and components in the engine.
+1. start executing your systems (usually by calling them from a main loop)
 
 Writting the definitions of the components and systems before creating the ES engine makes it easier to reuse them in different projects. You can group definitions of related components and systems in the same .js files.
 
@@ -197,6 +198,94 @@ eJSEngine.SystemDef({
 });
 ```
 
+## Bonus: links to components and entities
+
+**Why do we need Links ?**  
+To reduce the need for GC (Garbage Collection), entity.JS reuses objects and entity ids instead of throwing them away. It allows the ES to keep smooth FPS. But it also means that the reference you keep to them can be reused for new objects.
+Thus, if you are not careful, and you keep a reference to an object, that object can be destroyed by other systems. The next time you try to access that object, it may not exist anymore or worse it may point to a completely different object.
+
+**Where should we not use Links ?**  
+When for example you only need to keep a reference to components or entities for the duration of 1 single execution of your system. As soon as you exit your system's `execute()` function, you don't know if another system is not going to destroy them and thus you should use Links.
+
+**Where should we use Links ?**  
+When a component keeps references to other related components.  
+To keep references to special entities and components (like the player) from your game code (ie. from outside systems).
+
+**How does it works ?**  
+There are links for components: `cLink`, and links for entities: `eLink`. The engine keeps track of components and entities referenced by links and notifies the links when the components or entities are removed from the engine.  
+
+Note that for convenience, the links constructors are accessible from either `eJSEngine`, `eJS` or `this` when you are in a system.
+
+For example let's say some entities move by following other entities, those entities need to reference the position component of the entity they are following:
+
+```JavaScript
+eJSEngine.ComponentDef({
+	name: "Follower",
+	attr: {
+		followed: eJSEngine.cLink(),
+	},
+	// Define relations to other components:
+	links: [ "Position" ],
+	init: function( position ) {
+		this.followed.c = position;
+	}
+});
+
+eJSEngine.SystemDef({
+	name: "Follow",
+	cDefs: [ "Position", "Speed", "Follower" ],
+	init: function( entities, Position, Speed, Follower ) {
+		var lv = entities.liveView( Position, Speed, Follower );
+			q = lv.query( Position, Speed, Follower );
+		
+		this.execute = function( elapsed, time ) {
+			q.each( function( e, pos, speed, follower ) {
+				var followedPos = follower.followed.c;
+				// In case the followed component has disappeared,
+				// then we remove the follower component too.
+				// (Alternatively we could choose another followed)
+				if(followedPos === null) followedPos.$dispose();
+				else {
+					// Quick'n dirty (will stay around followedPos):
+					speed.dx = (followedPos.x - pos.x) / 100;
+					speed.dx = (followedPos.y - pos.y) / 100;
+				}
+			});
+		};
+		
+		// Finally let's free the ressources when we are destroyed:
+		this.onDisposed = function() {
+			q.dispose();
+			lv.dispose();
+		};
+	}
+});
+```
+
+Here is how you can use `cLink` and `eLink`:
+
+```JavaScript
+var pos = Position( 0, 0 ),
+	speed = Speed( 0, 0 ),
+	entity = entities.newEntity( pos, speed );
+
+// Set the link at initialization or after:
+var posL = eJS.cLink( pos ),
+	entityL = eJS.eLink();
+entityL.e = entity;
+
+// Let's see what happen when the links are cut:
+pos.$dispose();
+posL.c === null;	// => true
+eJS.disposeEntity(entity);
+entityL.e === -1;	// => true
+
+// When you don't need a Link anymore, let entity.JS reuse it:
+posL.dispose();
+entityL.dispose();
+```
+
+
 ## Create the ES engine
 
 This is simple:
@@ -216,7 +305,8 @@ You can pass the additional arguments expected by the system's `init` function. 
 ```JavaScript
 var moveSys = eJS.newSystem( "Move", false ),
 	spawnSys = eJS.newSystem( "SpawnRandomMoveables", 200, 200 ),
-	killSys = eJS.newSystem( "KillAtEdge", 200, 200 );
+	killSys = eJS.newSystem( "KillAtEdge", 200, 200 ),
+	followSys = eJS.newSystem( "Follow" );
 ```
 
 Now you have your systems. You can access their methods, for example:
@@ -278,6 +368,7 @@ var time = 0,
 	end = 10 * 60;
 for( var i = 1; i <= end; i++ ) {
 	time += elapsed;
+	followSys.execute( elapsed, time );
 	moveSys.execute( elapsed, time );
 	killSys.execute( elapsed, time );
 	spawnSys.execute( elapsed, time );
