@@ -106,7 +106,7 @@ eJSEngine.SystemDef({
 		
 		// Another public function.
 		// This one is required. It is used to execute the system:
-		this.execute = function( elapsed, time ) {
+		this.execute = function( time, elapsed ) {
 			// Here we receive the components in the order we asked
 			// in the liveQuery constructor.
 			lq.each( function( e, speed, pos ) {
@@ -145,7 +145,7 @@ eJSEngine.SystemDef({
 		// Accumulate elapsed time:
 		var timeAcc = 0;
 		
-		this.execute = function( elapsed, time ) {
+		this.execute = function( time, elapsed ) {
 			// Note: elapsed is in milliseconds (1 second = 1000 ms).
 			timeAcc += elapsed;
 			// 1 spawn every 2 seconds:
@@ -170,7 +170,7 @@ eJSEngine.SystemDef({
 	init: function( entities, width, height, Position ) {
 		var lq = entities.liveQuery( Position ).disposeWith( this );
 		
-		this.execute = function( elapsed, time ) {
+		this.execute = function( time, elapsed ) {
 			lq.each( function( e, pos ) {
 				if(pos.x < 0 || pos.x > width ||
 				   pos.y < 0 || pos.y > height) {
@@ -292,7 +292,7 @@ eJSEngine.SystemDef({
 		var lv = entities.liveView( Position, Speed, Follower );
 			q = lv.query( Position, Speed, Follower );
 		
-		this.execute = function( elapsed, time ) {
+		this.execute = function( time, elapsed ) {
 			q.each( function( e, pos, speed, follower ) {
 				var followedPos = follower.followed.c;
 				// In case the followed component has disappeared,
@@ -354,9 +354,9 @@ var time = 0,
 	end = 10 * 60;
 for( var i = 1; i <= end; i++ ) {
 	time += elapsed;
-	followSys.execute( elapsed, time );
-	moveSys.execute( elapsed, time );
-	killSys.execute( elapsed, time );
-	spawnSys.execute( elapsed, time );
+	followSys.execute( time, elapsed );
+	moveSys.execute( time, elapsed );
+	killSys.execute( time, elapsed );
+	spawnSys.execute( time, elapsed );
 }
 ```
