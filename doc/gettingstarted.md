@@ -80,8 +80,8 @@ eJSEngine.ComponentDef({
 	attr: {
 		dx: 0,
 		dy: 0
-	}	// No helpers this time.
-});
+	}
+});	// No helpers this time.
 ```
 
 
@@ -92,7 +92,7 @@ eJSEngine.SystemDef({
 	name: "Move",
 	cDefs: [ "Position", "Speed" ],
 	init: function( entities, reverseSpeed, Position, Speed ) {
-		// A liveQuery for specific components from the view:
+		// A liveQuery for specific components from the bag:
 		// (Note that the order of components is important)
 		var lq = entities.liveQuery( Speed, Position );
 		
@@ -289,11 +289,10 @@ eJSEngine.SystemDef({
 	name: "Follow",
 	cDefs: [ "Position", "Speed", "Follower" ],
 	init: function( entities, Position, Speed, Follower ) {
-		var lv = entities.liveView( Position, Speed, Follower );
-			q = lv.query( Position, Speed, Follower );
+		var lq = entities.liveQuery( Position, Speed, Follower ).disposeWith( this );
 		
 		this.execute = function( time, elapsed ) {
-			q.each( function( e, pos, speed, follower ) {
+			lq.each( function( e, pos, speed, follower ) {
 				var followedPos = follower.followed.c;
 				// In case the followed component has disappeared,
 				// then we remove the follower component too.
@@ -305,12 +304,6 @@ eJSEngine.SystemDef({
 					speed.dx = (followedPos.y - pos.y) / 100;
 				}
 			});
-		};
-		
-		// Finally let's free the ressources when we are destroyed:
-		this.onDisposed = function() {
-			q.dispose();
-			lv.dispose();
 		};
 	}
 });
