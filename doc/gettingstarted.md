@@ -230,21 +230,21 @@ Since we are not in a system, we have a little bit more work to do to get ready.
 var entities = eJS.entities;
 
 // Get the component creators:
-var Position = eJS.componentCreator("Position"),
-	Move = eJS.componentCreator("Move");
+var Position = eJS.componentCreator( "Position" ),
+	Move = eJS.componentCreator( "Move" );
 
 // You can create entities in different ways.
 
 // Simple:
-entities.newEntity(Position(10, 10));	// Doesn't move
-entities.newEntity(Position(15, 15), Move(0, 1));	// Moves up
+entities.newEntity( Position( 10, 10 ) );	// Doesn't move
+entities.newEntity( Position( 15, 15 ), Move( 0, 1 ) );	// Moves up
 
 // Flexible:
-var pos = Position(0, 0),
-	move = Move(0, 0);
-pos.setPosition(30, 30);
+var pos = Position( 0, 0 ),
+	move = Move( 0, 0 );
+pos.setPosition( 30, 30 );
 move.dx = 1;	// Moves right
-entities.newEntity(move, pos);
+entities.newEntity( move, pos );
 ```
 
 Tips:
