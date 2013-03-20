@@ -2,7 +2,7 @@ Getting advanced
 ===============
 
 
-Let's introduce some of the more advanced features of entity.JS:
+Introduction to some of the more advanced features of entity.JS:
 
 1. SystemGroup: manage your systems
 1. Multiple instances of the same systems (Tags, Alternative bag)
@@ -163,12 +163,17 @@ bag.addFrom( eJS.entities, eJS.selector( {
 
 Why use `Query` and `LiveQuery` ?
 
-Here is how to manually retrieve a component for an entity, but this is a slow process if done repeatedly in a loop:
+Here is how to manually retrieve a component for an entity, but it is a slow process if done repeatedly in a loop:
 
 ```JavaScript
-// Suppose e is an entity:
-var pos = eJS.component( e, "Position" );
+// Inside a system, you automatically receive references
+// to ComponentCreators. But outside, you must do:
+var Position = eJS.componentCreator( "Position" );
+
+// Now suppose e is an entity:
+var pos = Position.getFor( e );
 ```
+
 `Query` and `LiveQuery` give you a faster way to iterate all components from entities in a bag. Both will give the same results, but they are optimized for 2 different cases:
 - `Query` will always iterate over all the entities of the bag and filter out those that don't match the selector.
 - `LiveQuery` will internally keep an always up to date list of entities and components that matches the selector. It means that the engine automatically updates all liveQueries when you add or remove components to entities accordingly to their selectors and in an optimized way.
@@ -195,8 +200,9 @@ q.each( function( e, speed, pos ) {
 q.dispose();
 ```
 
-Note: You can also use .disposeWith() when working in a system.  
-Releasing ressources is especially important for LiveQuery.
+Note: You can also use `.disposeWith()` when working in a system.
+
+Releasing ressources is especially important with LiveQuery.
 
 ### IdMap
 
@@ -207,19 +213,18 @@ In this case you should use `eJS.IdMap()` (TODO).
 
 ## Direct references
 
-When you need to retrieve or pass ComponentDef or component, you have the choice between using the name as a string, or a direct reference. Here is an exemple:
+When you need to retrieve or pass a ComponentDef, a ComponentCreator or a component, you have the choice between using the name as a string, or a direct reference. Here is an exemple:
 
 ```JavaScript
-// Inside a system, you automatically receive 
-// references to ComponentCreators. But outside,
-// and supposing e is an entity, you must do :
+// Inside a system, you automatically receive references
+// to ComponentCreators. But outside, you must do:
 var Position = eJS.componentCreator( "Position" ),
-	pos;
+	lq;
 
 // Using a string:
-pos = eJS.component( e, "Position" );
+lq = eJS.entities.liveQuery( "Position" );
 // Using a direct reference:
-pos = eJS.component( e, Position );
+lq = eJS.entities.liveQuery( Position );
 ```
 
 Advantage of using strings:
@@ -228,6 +233,7 @@ Advantage of using strings:
 Advantages of using direct references:
 - it is faster. No string is used, even internally. It uses ids and array lookups which is faster than object properties lookups. And the JIT knows what is referenced and can finely optimize it, which is not the case with strings.
 - live debugging. You can directly go to the code in your debugger and you can check all the references.
+- better minification. Variable names are minified to 1 character only.
 
 entity.JS gives you the choice in most places, but requires the use of direct references in critical functions like when you are in loops.
 
