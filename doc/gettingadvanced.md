@@ -1,0 +1,234 @@
+Getting advanced
+===============
+
+
+Let's introduce some of the more advanced features of entity.JS:
+
+1. SystemGroup: manage your systems
+1. Multiple instances of the same systems (Tags, Alternative bag)
+1. Selectors
+1. Collections (Bag, Query and LiveQuery, IdMap)
+1. Direct references
+
+
+## SystemGroup: manage your systems
+
+When you start to have a lot of systems or if you want a more powerful management of system, use `SystemGroup`. A `SystemGroup` can be composed of systems and other `SystemGroup`.
+
+```JavaScript
+var updateGroup = eJS.systemGroup( "update" ),
+	movementGroup = eJS.systemGroup( "movement" );
+
+updateGroup.append( movementGroup, "KillAtEdge", "SpawnRandomMoveables" );
+movementGroup.append( "Follow", "Move" );
+
+// Another more readeable way using arrays.
+// Wach array will be translated into a new SystemGroup,
+// and the first string of each array is the group name.
+updateGroup = eJS.systemGroup( [ "update",
+	[ "movement",
+		"Follow",
+		"Move"
+	],
+	"KillAtEdge",
+	"SpawnRandomMoveables"
+] );
+
+// We can get any element:
+updateGroup = updateGroup.get( "." );
+movementGroup = updateGroup.get( "movement" );
+moveSys = updateGroup.get( "movement.Move" );
+
+// This will return null:
+var doesNotExists = updateGroup.get( "doesNotExists" );
+
+// Actually, the following will both work:
+moveSys = updateGroup.get( "movement.Move" );
+moveSys = updateGroup.get( "Move" );
+// Because system names are unique.
+```
+
+Now that you have your groups, you can use some new features:
+
+```JavaScript
+// Execute all your systems in order:
+updateGroup.execute( time, elapsed );
+
+// Pause systems (it won't be execute by the group):
+updateGroup.pause( "SpawnRandomMoveables", "Follow" );
+
+
+// Pause groups:
+updateGroup.pause( "movement" );
+updateGroup.pause( "." );	// Pauses updateGroup itself
+// This pauses each system and group directly under movementGroup,
+// but the group movementGroup is itself not modified:
+updateGroup.pause( "movement.*" );
+
+// Unpause:
+updateGroup.unpause( ".", "SpawnRandomMoveables", "movement", "movement.*" );
+
+// Time the execution of a system or group:
+updateGroup.time( "KillAtEdge", "movement.*" );
+
+// Stop timing the executions:
+updateGroup.untime( "KillAtEdge", "movement.*" );
+```
+
+
+## Multiple instances of the same systems
+
+### Tags
+
+You can use multiple instances of the same SystemDef. Each system instance is distinguished by a tag. A tag is an extension to the system name.
+
+By default, systems have the empty tag: "".
+
+For example, let's add another KillAtEdge system, but with a smaller area:
+
+```JavaScript
+// The tag is "smaller":
+var killSmallerSys = eJS.newSystem( "KillAtEdge:smaller", 50, 50 );
+
+// Add it to the update group, after the 
+// system "KillAtEdge" with the default empty tag:
+updateGroup.after( "KillAtEdge", "KillAtEdge:smaller");
+
+// Pause the system:
+updateGroup.pause( "KillAtEdge:smaller" );
+// Now you can just pause and unpause whichever you want.
+```
+
+Note: `"KillAtEdge"` and `"KillAtEdge:"` reference the same system. The ":" is omitted for simplicity.
+
+### Alternative bag
+
+You can choose a different bag than the default `eJS.entities` for your system. Just pass it after the system name:
+
+```JavaScript
+// We want to run a parallel world:
+var parallelBag = eJS.bag( "Parallel world" )
+	moveParaSys = eJS.newSystem( "Move:parallel", parallelBag, false );
+```
+
+Combined with tags, it can be very useful.
+
+
+## Selectors
+
+Selectors act like filters to select entities based on what components they possess. They are used by queries among other things.
+
+For example, let's say we want to reset the position of entities that are moving but not following another entity:
+
+```JavaScript
+var select = eJS.selector({
+	has: [ "Position", "Speed" ],
+	not: [ "Follower" ]
+});
+
+// Here we are only interested by the Position components:
+var lqMovingNotFollowing = entities.liveQuery( select, Position );
+lqMovingNotFollowing.each( function( e, pos ) {
+	pos.setPosition( 0, 0 );
+});
+```
+
+## Collections
+
+All collections are unordered, meaning that the order in which entities are kept and iterated is unpredictable.
+
+Currently there is only 1 kind of collection: the bags.
+
+### Bags
+
+A bag is a container in which you can add and remove any entity you want. Giving them name helps for debugging.
+
+`eJS.entities` is a special bag created by the engine and which contains all the entities of the engine. You can't directly add or remove entities from it.
+
+```JavaScript
+// Create a new bag:
+var bag = eJS.bag( "My bag" );
+
+// Add entities with specific components from another bag:
+bag.addFrom( eJS.entities, "Position", "Speed" );
+// Or with a selector:
+bag.addFrom( eJS.entities, eJS.selector( {
+	has: [ "Position" ]
+}));
+```
+
+`bag.count` tells you how many entities are in the bag.
+
+### Query and LiveQuery
+
+Why use `Query` and `LiveQuery` ?
+
+Here is how to manually retrieve a component for an entity, but this is a slow process if done repeatedly in a loop:
+
+```JavaScript
+// Suppose e is an entity:
+var pos = eJS.component( e, "Position" );
+```
+`Query` and `LiveQuery` give you a faster way to iterate all components from entities in a bag. Both will give the same results, but they are optimized for 2 different cases:
+- `Query` will always iterate over all the entities of the bag and filter out those that don't match the selector.
+- `LiveQuery` will internally keep an always up to date list of entities and components that matches the selector. It means that the engine automatically updates all liveQueries when you add or remove components to entities accordingly to their selectors and in an optimized way.
+
+In most case, you should use the `LiveQuery` which makes iteration faster. Use the `Query` when you want to save memory, when you rarely need to perform the iteration, or for components that are very often created and destroyed.
+
+By the way, it is easy to switch between them, so if you are not sure, just test both in real conditions.
+
+Here is an example with a Query:
+
+```JavaScript
+// Create a query that will iterate the Speed
+// and Position components:
+var q = eJS.entities.query( Speed, Position );
+
+// When iterating, you receive the entity e,
+// then the list of components:
+q.each( function( e, speed, pos ) {
+	// Do something...
+});
+
+// Release ressources when you don't need
+// the query anymore:
+q.dispose();
+```
+
+Note: You can also use .disposeWith() when working in a system.  
+Releasing ressources is especially important for LiveQuery.
+
+### IdMap
+
+When 2 ES engines need to communicate (for example between a server and a client), it may be difficult to identify the same entity in both engines, because the ids of entities will be different in the 2 engines.
+
+In this case you should use `eJS.IdMap()` (TODO).
+
+
+## Direct references
+
+When you need to retrieve or pass ComponentDef or component, you have the choice between using the name as a string, or a direct reference. Here is an exemple:
+
+```JavaScript
+// Inside a system, you automatically receive 
+// references to ComponentCreators. But outside,
+// and supposing e is an entity, you must do :
+var Position = eJS.componentCreator( "Position" ),
+	pos;
+
+// Using a string:
+pos = eJS.component( e, "Position" );
+// Using a direct reference:
+pos = eJS.component( e, Position );
+```
+
+Advantage of using strings:
+- it is a lot more readable.
+
+Advantages of using direct references:
+- it is faster. No string is used, even internally. It uses ids and array lookups which is faster than object properties lookups. And the JIT knows what is referenced and can finely optimize it, which is not the case with strings.
+- live debugging. You can directly go to the code in your debugger and you can check all the references.
+
+entity.JS gives you the choice in most places, but requires the use of direct references in critical functions like when you are in loops.
+
+It is usually better to use strings during initialization, definitions or rarely executed code, and keep direct references for performance intensive code.

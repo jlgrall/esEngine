@@ -17,7 +17,6 @@ Here are the main steps to make a project with entity.JS:
 
 Writting the definitions of the components and systems before creating the ES engine makes it easier to reuse them in different projects. You can group definitions of related components and systems in the same .js files.
 
-Note that when refering to component and system definitions, I often use their name as a string. It is more readable. But for larger projects, there is a way to use direct references. Which allows you to more easily find their source codes when you are debugging from a live browser. (TODO)
 
 ## Including the scripts
 
@@ -214,9 +213,6 @@ moveSys.setReverseSpeed( true );
 // Execute the system manually:
 moveSys.execute( 0, 0 );
 ```
-
-If you have a lot of systems and want to organize them by groups, see here (TODO).
-Also, if you want to make multiple systems of the same kind (for example with different arguments), you can use system tags (TODO).
 
 
 # Create entities and components

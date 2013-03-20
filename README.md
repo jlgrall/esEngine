@@ -13,6 +13,7 @@ Published under the MIT license.
 ## Documentation
 
 - [Getting started](doc/gettingstarted.md)
+- [Getting advanced](doc/gettingadvanced.md)
 
 ## Entity System (ES)
 
