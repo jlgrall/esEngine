@@ -323,7 +323,8 @@ entityL.e = entity;
 pos.$dispose();
 posL.c === null;	// => true
 eJS.disposeEntity(entity);
-entityL.e === -1;	// => true
+entityL.e === 0;	// => true
+entityL.e ? "true" : "false";	// => "false"
 
 // When you don't need a Link anymore, let entity.JS reuse it:
 posL.dispose();
