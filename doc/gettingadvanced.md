@@ -23,7 +23,7 @@ updateGroup.append( movementGroup, "KillAtEdge", "SpawnRandomMoveables" );
 movementGroup.append( "Follow", "Move" );
 
 // Another more readeable way using arrays.
-// Wach array will be translated into a new SystemGroup,
+// Each array will be translated into a new SystemGroup,
 // and the first string of each array is the group name.
 updateGroup = eJS.systemGroup( [ "update",
 	[ "movement",
@@ -99,7 +99,7 @@ updateGroup.pause( "KillAtEdge:smaller" );
 // Now you can just pause and unpause whichever you want.
 ```
 
-Note: `"KillAtEdge"` and `"KillAtEdge:"` reference the same system. The ":" is omitted for simplicity.
+Note: `"KillAtEdge"` and `"KillAtEdge:"` point to the same system. The ":" is omitted for simplicity.
 
 ### Alternative bag
 
@@ -234,6 +234,7 @@ Advantages of using direct references:
 - it is faster. No string is used, even internally. It uses ids and array lookups which is faster than object properties lookups. And the JIT knows what is referenced and can finely optimize it, which is not the case with strings.
 - live debugging. You can directly go to the code in your debugger and you can check all the references.
 - better minification. Variable names are minified to 1 character only.
+- allows to do introspection and manage things dynamically without knowing their names.
 
 entity.JS gives you the choice in most places, but requires the use of direct references in critical functions like when you are in loops.
 
