@@ -150,9 +150,9 @@ A bag is a container in which you can add and remove any entity you want. Giving
 var bag = eJS.bag( "My bag" );
 
 // Add entities with specific components from another bag:
-bag.addFrom( eJS.entities, "Position", "Speed" );
+bag.add( eJS.entities, "Position", "Speed" );
 // Or with a selector:
-bag.addFrom( eJS.entities, eJS.selector( {
+bag.add( eJS.entities, eJS.selector( {
 	has: [ "Position" ]
 }));
 ```

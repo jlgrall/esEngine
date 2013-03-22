@@ -14,8 +14,18 @@ Published under the MIT license.
 
 ## Documentation
 
+[Documentation summary](doc/README.md)
+
+How it works:
 - [Getting started](doc/gettingstarted.md)
 - [Getting advanced](doc/gettingadvanced.md)
+
+API:
+- [Engine](doc/engine.md)
+- [Entities](doc/entities.md)
+- [Components](doc/components.md)
+- [Systems](doc/systems.md)
+- [Collections](doc/collections.md)
 
 ## Entity System (ES)
 

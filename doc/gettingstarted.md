@@ -236,11 +236,12 @@ entities.newEntity( Position( 10, 10 ) );	// Doesn't move
 entities.newEntity( Position( 15, 15 ), Move( 0, 1 ) );	// Moves up
 
 // Flexible:
-var pos = Position( 0, 0 ),
-	move = Move( 0, 0 );
+var pos = Position( 0, 0 );
 pos.setPosition( 30, 30 );
+entities.newEntity( move );
+var move = Move( 0, 0 );
 move.dx = 1;	// Moves right
-entities.newEntity( move, pos );
+move.$addTo( entity );
 ```
 
 Tips:
