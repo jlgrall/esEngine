@@ -35,3 +35,38 @@ Entity System is a software architecture that is specially well suited to make g
 
 Step-by-step introduction to ES: http://www.richardlord.net/blog/what-is-an-entity-framework  
 More infos about ES: http://entity-systems.wikidot.com/
+
+
+## How to build and contribute
+
+### Install
+
+You need to have [Node.js](http://nodejs.org/) and [git](http://git-scm.com/) installed. You also need to have [grunt-cli](http://gruntjs.com/) as a global Node.js install:
+
+```sh
+npm install -g grunt-cli
+```
+
+Clone the git repository locally and go in it:
+
+```sh
+git clone git://github.com/jquery/jquery.git
+cd esEngine
+```
+
+Install the build dependencies (Node.js packages) in the folder (takes 2 minutes):
+
+```sh
+npm install
+```
+
+That's it, you are ready. Now you can use the following commands.
+
+### Commands
+
+- `grunt`: build and check everything. You can find built files in the `dist/` folder.
+- `grunt clean`: clean the `dist/` folder.
+- `grunt watch`: when you are editing the files, it will automatically rebuild the needed files when you save them.
+
+**Important: don't forget to run `grunt` before you commit to check that everything works.**
+
