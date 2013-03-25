@@ -4,9 +4,9 @@ Getting started
 
 The only exposed variable is `window.eJSEngine`. It is the constructor that creates a new ES (Entity System).
 
-Here are the main steps to make a project with entity.JS:
+Here are the main steps to make a project with esEngine:
 
-1. include the scripts: entity.js and any additional library that adds definitions of components and systems.
+1. include the scripts: esengine.js and any additional library that adds definitions of components and systems.
 1. define your components. What kind of data they will hold.
 1. define your systems. Each system states which components it will use.
 1. create the ES engine.
@@ -20,7 +20,7 @@ Writting the definitions of the components and systems before creating the ES en
 
 ## Including the scripts
 
-First you include the entity.JS script.  
+First you include the esEngine script.  
 Then any additional library you want to use (optional).  
 Finally you add your code.
 
@@ -29,7 +29,7 @@ For example, let's say you are going to use a simple renderer named Entity-Simpl
 Put this at the end of your body:
 
 ```HTML
-<script src="js/entity.js" type="text/javascript"></script>
+<script src="js/esengine.js" type="text/javascript"></script>
 <script src="js/entity-simplerenderer.js" type="text/javascript"></script>
 <script src="js/mycoolproject.js" type="text/javascript"></script>
 ```
@@ -252,7 +252,7 @@ Tips:
 ## Bonus: links to components and entities
 
 **Why do we need Links ?**  
-To reduce the need for GC (Garbage Collection), entity.JS reuses objects and entity ids instead of throwing them away. It allows the ES to keep smooth FPS. But it also means that the reference you keep to them can be reused for new objects.
+To reduce the need for GC (Garbage Collection), esEngine reuses objects and entity ids instead of throwing them away. It allows the ES to keep smooth FPS. But it also means that the reference you keep to them can be reused for new objects.
 Thus, if you are not careful, and you keep a reference to an object, that object can be destroyed by other systems. The next time you try to access that object, it may not exist anymore or worse it may point to a completely different object.
 
 **Where should we not use Links ?**  
@@ -327,7 +327,7 @@ eJS.disposeEntity(entity);
 entityL.e === 0;	// => true
 entityL.e ? "true" : "false";	// => "false"
 
-// When you don't need a Link anymore, let entity.JS reuse it:
+// When you don't need a Link anymore, let esEngine reuse it:
 posL.dispose();
 entityL.dispose();
 ```

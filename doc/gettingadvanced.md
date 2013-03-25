@@ -2,7 +2,7 @@ Getting advanced
 ===============
 
 
-Introduction to some of the more advanced features of entity.JS:
+Introduction to some of the more advanced features of esEngine:
 
 1. SystemGroup: manage your systems
 1. Multiple instances of the same systems (Tags, Alternative bag)
@@ -236,6 +236,6 @@ Advantages of using direct references:
 - better minification. Variable names are minified to 1 character only.
 - allows to do introspection and manage things dynamically without knowing their names.
 
-entity.JS gives you the choice in most places, but requires the use of direct references in critical functions like when you are in loops.
+esEngine gives you the choice in most places, but requires the use of direct references in critical functions like when you are in loops.
 
 It is usually better to use strings during initialization, definitions or rarely executed code, and keep direct references for performance intensive code.

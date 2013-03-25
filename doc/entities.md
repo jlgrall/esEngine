@@ -5,7 +5,7 @@ Collections
 ## Entity
 
 An entity represents the relation of associated components.  
-In entity.JS, entities are not objects. They are just integers > 0.  When entities are disposed, the integers will be reused for new entities.  So don't store entities directly, but use Links.  
+In esEngine, entities are not objects. They are just integers > 0.  When entities are disposed, the integers will be reused for new entities.  So don't store entities directly, but use Links.  
 In most cases you can use entities as if they were objects. Returning `0` (a falsy value) when no entity is found allows to use conditions like: `if( entity ) ...`.  
 Entity destruction can happen in 2 ways:
 - when the last component of an entity is disposed.

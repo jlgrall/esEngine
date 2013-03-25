@@ -16,10 +16,10 @@ Throws an error if the name is already taken.
 - **objectDef**: an object with the following properties:
     - **name**: a string with the name for the system.
     - **cDefs**: an array of ComponentDef that this system requires to work. You can give references to ComponentDefs or their names.
-    - **init**: `function( bag, args..., componentCreator...)`: `bag` and `componentCreator...` are automatically given by entity.JS.
-        - **bag**: the default bag that the system will work on. By default entity.JS will provide `eJS.entities`, but you can choose an alternative bag at system instanciation (see next point).
+    - **init**: `function( bag, args..., componentCreator...)`: `bag` and `componentCreator...` are automatically given by esEngine.
+        - **bag**: the default bag that the system will work on. By default esEngine will provide `eJS.entities`, but you can choose an alternative bag at system instanciation (see next point).
         - **args...**: any additional argument you can give when instanciating the system. If the first argument is a bag, it will replace the default **bag** argument.
-        - **componentCreator...**: the componentCreators that correspond to the cDefs, automatically given by entity.JS.
+        - **componentCreator...**: the componentCreators that correspond to the cDefs, automatically given by esEngine.
 
 ### .name
 Name of the system.

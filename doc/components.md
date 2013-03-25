@@ -69,7 +69,7 @@ Adds this component to an entity.
 Throws an error if the component was already added to another entity.
 
 ### .$dispose()
-Removes this component from its entity and from the ES engine and disposes it. (You must not continue to use this component afterwards, as it may be reused by entity.JS to make future components)
+Removes this component from its entity and from the ES engine and disposes it. (You must not continue to use this component afterwards, as it may be reused by esEngine to make future components)
 
 
 ## cLink
