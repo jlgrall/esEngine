@@ -16,8 +16,8 @@ Introduction to some of the more advanced features of esEngine:
 When you start to have a lot of systems or if you want a more powerful management of system, use `SystemGroup`. A `SystemGroup` can be composed of systems and other `SystemGroup`.
 
 ```JavaScript
-var updateGroup = eJS.systemGroup( "update" ),
-	movementGroup = eJS.systemGroup( "movement" );
+var updateGroup = es.systemGroup( "update" ),
+	movementGroup = es.systemGroup( "movement" );
 
 updateGroup.append( movementGroup, "KillAtEdge", "SpawnRandomMoveables" );
 movementGroup.append( "Follow", "Move" );
@@ -25,7 +25,7 @@ movementGroup.append( "Follow", "Move" );
 // Another more readeable way using arrays.
 // Each array will be translated into a new SystemGroup,
 // and the first string of each array is the group name.
-updateGroup = eJS.systemGroup( [ "update",
+updateGroup = es.systemGroup( [ "update",
 	[ "movement",
 		"Follow",
 		"Move"
@@ -88,7 +88,7 @@ For example, let's add another KillAtEdge system, but with a smaller area:
 
 ```JavaScript
 // The tag is "smaller":
-var killSmallerSys = eJS.newSystem( "KillAtEdge:smaller", 50, 50 );
+var killSmallerSys = es.newSystem( "KillAtEdge:smaller", 50, 50 );
 
 // Add it to the update group, after the 
 // system "KillAtEdge" with the default empty tag:
@@ -103,12 +103,12 @@ Note: `"KillAtEdge"` and `"KillAtEdge:"` point to the same system. The ":" is om
 
 ### Alternative bag
 
-You can choose a different bag than the default `eJS.entities` for your system. Just pass it after the system name:
+You can choose a different bag than the default `es.entities` for your system. Just pass it after the system name:
 
 ```JavaScript
 // We want to run a parallel world:
-var parallelBag = eJS.bag( "Parallel world" )
-	moveParaSys = eJS.newSystem( "Move:parallel", parallelBag, false );
+var parallelBag = es.bag( "Parallel world" )
+	moveParaSys = es.newSystem( "Move:parallel", parallelBag, false );
 ```
 
 Combined with tags, it can be very useful.
@@ -121,7 +121,7 @@ Selectors act like filters to select entities based on what components they poss
 For example, let's say we want to reset the position of entities that are moving but not following another entity:
 
 ```JavaScript
-var select = eJS.selector({
+var select = es.selector({
 	has: [ "Position", "Speed" ],
 	not: [ "Follower" ]
 });
@@ -143,16 +143,16 @@ Currently there is only 1 kind of collection: the bags.
 
 A bag is a container in which you can add and remove any entity you want. Giving them name helps for debugging.
 
-`eJS.entities` is a special bag created by the engine and which contains all the entities of the engine. You can't directly add or remove entities from it.
+`es.entities` is a special bag created by the engine and which contains all the entities of the engine. You can't directly add or remove entities from it.
 
 ```JavaScript
 // Create a new bag:
-var bag = eJS.bag( "My bag" );
+var bag = es.bag( "My bag" );
 
 // Add entities with specific components from another bag:
-bag.add( eJS.entities, "Position", "Speed" );
+bag.add( es.entities, "Position", "Speed" );
 // Or with a selector:
-bag.add( eJS.entities, eJS.selector( {
+bag.add( es.entities, es.selector( {
 	has: [ "Position" ]
 }));
 ```
@@ -168,7 +168,7 @@ Here is how to manually retrieve a component for an entity, but it is a slow pro
 ```JavaScript
 // Inside a system, you automatically receive references
 // to ComponentCreators. But outside, you must do:
-var Position = eJS.componentCreator( "Position" );
+var Position = es.componentCreator( "Position" );
 
 // Now suppose e is an entity:
 var pos = Position.getFor( e );
@@ -187,7 +187,7 @@ Here is an example with a Query:
 ```JavaScript
 // Create a query that will iterate the Speed
 // and Position components:
-var q = eJS.entities.query( Speed, Position );
+var q = es.entities.query( Speed, Position );
 
 // When iterating, you receive the entity e,
 // then the list of components:
@@ -208,7 +208,7 @@ Releasing ressources is especially important with LiveQuery.
 
 When 2 ES engines need to communicate (for example between a server and a client), it may be difficult to identify the same entity in both engines, because the ids of entities will be different in the 2 engines.
 
-In this case you should use `eJS.IdMap()` (TODO).
+In this case you should use `es.IdMap()` (TODO).
 
 
 ## Direct references
@@ -218,13 +218,13 @@ When you need to retrieve or pass a ComponentDef, a ComponentCreator or a compon
 ```JavaScript
 // Inside a system, you automatically receive references
 // to ComponentCreators. But outside, you must do:
-var Position = eJS.componentCreator( "Position" ),
+var Position = es.componentCreator( "Position" ),
 	lq;
 
 // Using a string:
-lq = eJS.entities.liveQuery( "Position" );
+lq = es.entities.liveQuery( "Position" );
 // Using a direct reference:
-lq = eJS.entities.liveQuery( Position );
+lq = es.entities.liveQuery( Position );
 ```
 
 Advantage of using strings:

@@ -2,7 +2,7 @@ Getting started
 ===============
 
 
-The only exposed variable is `window.eJSEngine`. It is the constructor that creates a new ES (Entity System).
+The only exposed variable is `window.esEngine`. It is the constructor that creates a new ES (Entity System).
 
 Here are the main steps to make a project with esEngine:
 
@@ -40,7 +40,7 @@ Good. Now let's see your code.
 ## Defining a component
 
 ```JavaScript
-eJSEngine.ComponentDef({
+esEngine.ComponentDef({
 	name: "Position",
 	attr: {
 		x: 0,
@@ -74,7 +74,7 @@ This component definition will be available from any ES engine to make new compo
 Now let's make another component definition:
 
 ```JavaScript
-eJSEngine.ComponentDef({
+esEngine.ComponentDef({
 	name: "Speed",
 	attr: {
 		dx: 0,
@@ -87,7 +87,7 @@ eJSEngine.ComponentDef({
 ## Defining a system
 
 ```JavaScript
-eJSEngine.SystemDef({
+esEngine.SystemDef({
 	name: "Move",
 	cDefs: [ "Position", "Speed" ],
 	init: function( entities, reverseSpeed, Position, Speed ) {
@@ -137,7 +137,7 @@ This system definition will be available from any ES engine to make new systems 
 Let's make 2 other systems. One randomly spawns new entities and the other destroys entities leaving the area.
 
 ```JavaScript
-eJSEngine.SystemDef({
+esEngine.SystemDef({
 	name: "SpawnRandomMoveables",
 	cDefs: [ "Position", "Speed" ],
 	init: function( entities, width, height, Position, Speed ) {
@@ -163,7 +163,7 @@ eJSEngine.SystemDef({
 	}
 });
 
-eJSEngine.SystemDef({
+esEngine.SystemDef({
 	name: "KillAtEdge",
 	cDefs: [ "Position" ],
 	init: function( entities, width, height, Position ) {
@@ -187,11 +187,11 @@ eJSEngine.SystemDef({
 This is simple:
 
 ```JavaScript
-var eJS = window.eJS = window.eJSEngine();
+var es = window.es = window.esEngine();
 ```
 
-Now `eJS` is a reference to the new engine.
-You can use another name if you want, but I recommend using `eJS`: simple and easy to remember.
+Now `es` is a reference to the new engine.
+You can use another name if you want, but I recommend using `es`: simple and easy to remember.
 
 
 ## Initialize a system
@@ -199,9 +199,9 @@ You can use another name if you want, but I recommend using `eJS`: simple and ea
 You can pass the additional arguments expected by the system's `init` function. In our case, `reverseSpeed` is set to false at the beginning.
 
 ```JavaScript
-var moveSys = eJS.newSystem( "Move", false ),
-	spawnSys = eJS.newSystem( "SpawnRandomMoveables", 200, 200 ),
-	killSys = eJS.newSystem( "KillAtEdge", 200, 200 );
+var moveSys = es.newSystem( "Move", false ),
+	spawnSys = es.newSystem( "SpawnRandomMoveables", 200, 200 ),
+	killSys = es.newSystem( "KillAtEdge", 200, 200 );
 ```
 
 Now you have your systems. You can access their methods, for example:
@@ -223,11 +223,11 @@ Since we are not in a system, we have a little bit more work to do to get ready.
 
 ```JavaScript
 // The bag with all the entities of the ES engine:
-var entities = eJS.entities;
+var entities = es.entities;
 
 // Get the component creators:
-var Position = eJS.componentCreator( "Position" ),
-	Move = eJS.componentCreator( "Move" );
+var Position = es.componentCreator( "Position" ),
+	Move = es.componentCreator( "Move" );
 
 // You can create entities in different ways.
 
@@ -265,15 +265,15 @@ To keep references to special entities and components (like the player) from you
 **How does it works ?**  
 There are links for components: `cLink`, and links for entities: `eLink`. The engine keeps track of components and entities referenced by links and notifies the links when the components or entities are removed from the engine.  
 
-Note that for convenience, the links constructors are accessible from either `eJSEngine`, `eJS` or `this` when you are in a system.
+Note that for convenience, the links constructors are accessible from either `esEngine`, `es` or `this` when you are in a system.
 
 For example let's say some entities move by following other entities, those entities need to reference the position component of the entity they are following:
 
 ```JavaScript
-eJSEngine.ComponentDef({
+esEngine.ComponentDef({
 	name: "Follower",
 	attr: {
-		followed: eJSEngine.cLink(),
+		followed: esEngine.cLink(),
 	},
 	// Define relations to other components:
 	links: [ "Position" ],
@@ -282,7 +282,7 @@ eJSEngine.ComponentDef({
 	}
 });
 
-eJSEngine.SystemDef({
+esEngine.SystemDef({
 	name: "Follow",
 	cDefs: [ "Position", "Speed", "Follower" ],
 	init: function( entities, Position, Speed, Follower ) {
@@ -305,7 +305,7 @@ eJSEngine.SystemDef({
 	}
 });
 
-var	followSys = eJS.newSystem( "Follow" );
+var	followSys = es.newSystem( "Follow" );
 ```
 
 Here is how you can use `cLink` and `eLink`:
@@ -316,14 +316,14 @@ var pos = Position( 0, 0 ),
 	entity = entities.newEntity( pos, speed );
 
 // Set the link at initialization or after:
-var posL = eJS.cLink( pos ),
-	entityL = eJS.eLink();
+var posL = es.cLink( pos ),
+	entityL = es.eLink();
 entityL.e = entity;
 
 // Let's see what happen when the links are cut:
 pos.$dispose();
 posL.c === null;	// => true
-eJS.disposeEntity(entity);
+es.disposeEntity(entity);
 entityL.e === 0;	// => true
 entityL.e ? "true" : "false";	// => "false"
 

@@ -11,7 +11,7 @@ A component should only contain datas that can be JSON encoded (ie. no function,
 Once a ComponentDef is made, you can inspect its properties, but you must not change nor execute them.  
 Name of components must be unique.
 
-### eJSEngine.ComponentDef( objectDef )
+### esEngine.ComponentDef( objectDef )
 **Defines** and returns a new type of component.  
 Throws an error if the name is already taken.
 - **objectDef**: an object with the following properties:
@@ -37,9 +37,9 @@ Methods that will be available on the created component for getting/setting data
 An object used to control components of a certain type in an ES engine.  
 You can obtain a ComponentCreator in two ways:
 - in a system where you get it automatically
-- `eJS.componentCreator()`
+- `es.componentCreator()`
 
-### eJS.componentCreator( ComponentDef )
+### es.componentCreator( ComponentDef )
 Returns a componentCreator for the given ComponentDef.
 - **ComponentDef**: can be a reference to a ComponentDef or the name of a ComponentDef as a string.
 
@@ -78,7 +78,7 @@ Link to a component.
 Keeps a direct reference to a component until the component is disposed, safeguarding you from inadvertently keeping a reference to a component that has been disposed by another system.  
 When a link is disposed, it can be reused by the engine.
 
-### eJS.cLink( [component] )
+### es.cLink( [component] )
 **Constructor**: returns a new link to a component.
 - **entity** (optional): the initial component. By default it is `null`.
 

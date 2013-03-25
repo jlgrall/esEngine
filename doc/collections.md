@@ -6,10 +6,10 @@ Collections
 
 Immutable object that act like filters to select entities based on what components they have. 
 
-### eJS.anySelector
+### es.anySelector
 A selector that matches any entity.
 
-### eJS.selector( objectDef | componentType... )
+### es.selector( objectDef | componentType... )
 **Constructor**: returns a new selector or an existing selector if the description matches an existing one.  
 Accepts either an objectDef or a list of component types.
 - **objectDef**: an object with the following properties:
@@ -28,12 +28,12 @@ Returns true if both selectors matches the same entities.
 
 A set of entities.
 
-### eJS.bag( [name] )
+### es.bag( [name] )
 **Constructor**: returns a new bag.
 - **name** (optional): the name of the bag.
 
-### eJS.entities
-A special Bag containing all the entities managed by this engine. See: eJS.
+### es.entities
+A special Bag containing all the entities managed by this engine. See: es.
 
 ### .newEntity( component... )
 Creates a new entity and adds it to this bag. See: Entity.

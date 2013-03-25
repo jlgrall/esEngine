@@ -11,13 +11,13 @@ Entity destruction can happen in 2 ways:
 - when the last component of an entity is disposed.
 - calling `.disposeEntity(entity)`.
 
-### {eJS,bag}.newEntity( component... )
+### {es,bag}.newEntity( component... )
 **Constructor**: returns a new entity with the given components.  
-This method is available from `eJS` and from any bag. It will automatically add the entity to that bag in addition to the default `eJS.entities` bag.
+This method is available from `es` and from any bag. It will automatically add the entity to that bag in addition to the default `es.entities` bag.
 
-### {eJS,bag}.disposeEntity( entity )
+### {es,bag}.disposeEntity( entity )
 Disposes the given entity and all its components.  
-This method is available from `eJS` and from any bag.
+This method is available from `es` and from any bag.
 
 
 ## eLink
@@ -26,7 +26,7 @@ Link to an entity.
 Keeps a direct reference to an entity until the entity is disposed, safeguarding you from inadvertently keeping a reference to an entity that has been disposed by another system.  
 When a link is disposed, it can be reused by the engine.
 
-### eJS.eLink( [entity] )
+### es.eLink( [entity] )
 **Constructor**: returns a new link to an entity.
 - **entity** (optional): the initial entity. By default it is `0` (a falsy value).
 
