@@ -8,9 +8,10 @@ _Entity Component System_ is often simply referenced as _Entity System_ or _ES_.
 
 Documentation is written before the code. Code must conform to the written documentation. All example codes from the documentation are part of the unit tests.
 
-Compatible with modern browsers and IE >= 9.
+Compatible with modern browsers and IE9+.
 
 Published under the MIT license.
+
 
 ## Documentation
 
@@ -26,6 +27,7 @@ API:
 - [Components](doc/components.md)
 - [Systems](doc/systems.md)
 - [Collections](doc/collections.md)
+
 
 ## Entity System (ES)
 
