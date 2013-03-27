@@ -7,6 +7,6 @@
 *
 * Date: @DATE
 */
-(function( window, undefined ) {
+(function( window, Object, String, Array, undefined ) {
 
 "use strict";

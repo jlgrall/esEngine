@@ -24,4 +24,4 @@ if ( typeof module === "object" && typeof module.exports === "object" ) {
 	}
 }
 
-})( this );
+})( this, Object, String, Array );

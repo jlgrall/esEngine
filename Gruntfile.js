@@ -19,6 +19,7 @@ module.exports = function(grunt) {
 				options: {
 				},
 				src: [
+					'src/utils.js',
 					'src/engine.js',
 					'src/entities.js',
 					'src/components.js',
@@ -29,6 +30,7 @@ module.exports = function(grunt) {
 			test: ['test/**/*.js'],
 			dev: {
 				options: {
+					newcap: false
 				},
 				src: ['<%= concat.src.dest %>']
 			}
