@@ -83,6 +83,13 @@ module.exports = function(grunt) {
 			dev: {
 				src: '<%= concat.src.dest %>',
 				dest: 'dist/<%= pkg.config.file_name %>.min.js'
+			},
+			gzip: {
+				options: {
+					report: "gzip"
+				},
+				src: '<%= concat.src.dest %>',
+				dest: 'dist/<%= pkg.config.file_name %>.min.js'
 			}
 		},
 		// https://github.com/treasonx/grunt-markdown
@@ -164,6 +171,9 @@ module.exports = function(grunt) {
 	
 	// To (re-)build everything:
 	grunt.registerTask('build', ['config', 'meta', 'jshint:test', 'src', 'doc']);
+	
+	// To get a report on the minified sizes (must be built already):
+	grunt.registerTask('gzip', ['uglify:gzip']);
 	
 	// To be executed before a commit, checking everything:
 	grunt.registerTask('precommit', []);
