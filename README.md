@@ -41,7 +41,7 @@ More infos about ES: http://entity-systems.wikidot.com/
 
 ### Install
 
-You need to have [Node.js](http://nodejs.org/) and [git](http://git-scm.com/) installed. You also need to have [grunt-cli](http://gruntjs.com/) as a global Node.js install:
+You need to have [git](http://git-scm.com/) and [Node.js](http://nodejs.org/) installed. You also need to have [grunt-cli](http://gruntjs.com/) as a global Node.js install:
 
 ```sh
 npm install -g grunt-cli

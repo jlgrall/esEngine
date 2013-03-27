@@ -20,9 +20,9 @@ Writting the definitions of the components and systems before creating the ES en
 
 ## Including the scripts
 
-First you include the esEngine script.  
-Then any additional library you want to use (optional).  
-Finally you add your code.
+1. First you include the esEngine script.  
+1. Then any additional library you want to use (optional).  
+1. Finally you add your code.
 
 For example, let's say you are going to use a simple renderer named Entity-SimpleRenderer, that provides components and systems for you. And let's say you put all your code in a single file "mycoolproject.js".
 
@@ -33,6 +33,8 @@ Put this at the end of your body:
 <script src="js/entity-simplerenderer.js" type="text/javascript"></script>
 <script src="js/mycoolproject.js" type="text/javascript"></script>
 ```
+
+_Note that esEngine can also be loaded using the Node.js module pattern, or as a named AMD module._
 
 Good. Now let's see your code.
 

@@ -9,7 +9,7 @@ var _ = require('lodash');
 
 var esEngine = require('../dist/esengine'); 
 
-exports.testbase = function(test){
+exports.APITest = function(test){
     //test.expect(1);
     
     // There is no reliable way to test if esEngine would be
