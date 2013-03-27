@@ -45,7 +45,7 @@ Throws an error if the tag is already taken for the system name.
 - **args...**: additional arguments required by the SystemDef.
 
 
-### .definition
+### .def
 A reference to the SystemDef of this system.
 
 ### .name

@@ -43,6 +43,8 @@ You can obtain a ComponentCreator in two ways:
 Returns a componentCreator for the given ComponentDef.
 - **ComponentDef**: can be a reference to a ComponentDef or the name of a ComponentDef as a string.
 
+### .def
+A reference to the ComponentDef of this ComponentCreator.
 
 ### .name
 Name of the component type.
