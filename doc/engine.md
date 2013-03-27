@@ -11,6 +11,12 @@ This is the only exposed variable.
 Preferred way: `var es = window.es = window.esEngine();`  
 `es` is the recommended name. It is the name we will use in all the documentations.
 
+### esEngine.ComponentDef( objectDef )
+Defines a new type of component. See: ComponentDef.
+
+### esEngine.SystemDef( objectDef )
+Defines a new type of component. See: SystemDef.
+
 
 ## es
 
@@ -29,14 +35,8 @@ Creates a new entity. See: Entity.
 ### es.disposeEntity( entity )
 Disposes an entity. See: Entity.
 
-### esEngine.ComponentDef( objectDef )
-Defines a new type of component. See: ComponentDef.
-
 ### es.componentCreator( ComponentName | ComponentDef )
 Get a ComponentCreator. See: ComponentCreator.
-
-### esEngine.SystemDef( objectDef )
-Defines a new type of component. See: SystemDef.
 
 ### es.newSystem( SystemDef, [bag], args... )
 Creates a new system. See: System.

@@ -164,7 +164,7 @@ module.exports = function(grunt) {
 	// Use when you are editing the doc:
 	grunt.registerTask('doc', ['markdown:doc']);
 	// Use when you are editing the unit tests:
-	grunt.registerTask('test', ['jshint:test', 'nodeunit:test']);
+	grunt.registerTask('test', ['jshint:test', 'nodeunit:dev']);
 	
 	// To clean up generated files:
 	grunt.registerTask('clean', ['_clean:dist']);
