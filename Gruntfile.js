@@ -11,6 +11,8 @@ module.exports = function(grunt) {
 			// configure JSHint (documented at http://www.jshint.com/docs/)
 			options: {
 				node: true,
+				es5: true,
+				smarttabs: true,
 				globals: {
 				}
 			},
@@ -126,7 +128,7 @@ module.exports = function(grunt) {
 			},
 			src: {
 				files: ['<%= concat.src.src %>'],
-				tasks: ['src']
+				tasks: ['validate_src']
 			},
 			doc: {
 				files: ['<%= markdown.doc.files %>'],
@@ -159,8 +161,10 @@ module.exports = function(grunt) {
 	grunt.registerTask('config', ['jshint:config']);
 	// Use when you are editing the project meta files (files in the root folder):
 	grunt.registerTask('meta', ['markdown:meta']);
-	// Use when you are editing the code in src:
+	// Use to build the code in src:
 	grunt.registerTask('src', ['jshint:src', 'concat:src', 'string-replace:dev', 'jshint:dev', 'nodeunit:dev', 'uglify:dev', 'string-replace:min']);
+	// Use when you are editing the code in src:
+	grunt.registerTask('validate_src', ['jshint:src', 'concat:src', 'jshint:dev', 'nodeunit:dev']);
 	// Use when you are editing the doc:
 	grunt.registerTask('doc', ['markdown:doc']);
 	// Use when you are editing the unit tests:
