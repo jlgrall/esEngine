@@ -1,6 +1,6 @@
 
-// The class for all systemDefs:
-var SystemDef = Object_freeze( {} ),
+// The prototype for all systemDefs:
+var SystemDefProto = Object_freeze( {} ),
 	esEngine_sDefs = esEngine._sDefs = {};
 
 
@@ -25,11 +25,13 @@ esEngine.SystemDef = function( objectDef ) {
 			if( !esEngine_cDefs[ cDef ] ) throw "No ComponentDef found with name: " + cDef;
 			cDef = esEngine_cDefs[ cDef ];
 		}
-		if( !( isPrototypeOf(ComponentDef, cDef) ) ) throw "cDef is not a valid ComponentDef";
+		if( !( isPrototypeOf( ComponentDefProto, cDef ) ) ) throw "cDef is not a valid ComponentDef";
 		cDefs.push( cDef );
 	}
 	
-	var sDef = Object_create( SystemDef );
+	if( name in esEngine_sDefs ) throw "A SystemDef already exists with the name: " + name;
+	
+	var sDef = Object_create( SystemDefProto );
 	
 	sDef.name = name;
 	sDef.cDefs = cDefs;
@@ -40,7 +42,6 @@ esEngine.SystemDef = function( objectDef ) {
 	definePropertiesUnwriteable( sDef, "name" );
 	freezeProperties( sDef, "cDefs", "init" );
 	
-	if( name in esEngine_sDefs ) throw "A SystemDef already exists with the name: " + name;
 	esEngine_sDefs[ name ] = sDef;
 	
 	return sDef;

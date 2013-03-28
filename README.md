@@ -54,7 +54,7 @@ git clone git://github.com/jquery/jquery.git
 cd esEngine
 ```
 
-Install the build dependencies (Node.js packages) in the folder (takes 2 minutes):
+Install the build dependencies (Node.js packages) in the folder (takes 1-2 minutes):
 
 ```sh
 npm install
