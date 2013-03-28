@@ -18,7 +18,7 @@ exports.APITest = function(test) {
 	currentName.cId = -1;
 	currentName.cName = undefined;
 	currentName.next = function() {
-		currentName.cName = "TheName_" + (++currentName.cId);
+		currentName.cName = "ComponentName_" + (++currentName.cId);
 		return currentName.cName;
 	};
 	
@@ -40,7 +40,7 @@ exports.APITest = function(test) {
 	test.ok(_.isObject(cDef.helpers) && _.isEmpty(cDef.helpers), "cDef's default helpers is an empty object");
 	
 	cDef = esEngine.ComponentDef({
-		name: "TEST1cDef",
+		name: currentName.next(),
 		attr: {
 			x: 0
 		},
@@ -49,7 +49,7 @@ exports.APITest = function(test) {
 			a: function() {}
 		}
 	});
-	test.ok(cDef.name === "TEST1cDef", "cDef has the correct name");
+	test.ok(cDef.name === currentName(), "cDef has the correct name");
 	test.ok(_.isObject(cDef.attr) && cDef.attr.x === 0, "cDef's attr has a property");
 	test.ok(_.isFunction(cDef.init), "cDef's init is a function");
 	test.ok(_.isObject(cDef.helpers) && _.isFunction(cDef.helpers.a), "cDef's helpers has a function");
