@@ -84,7 +84,7 @@ module.exports = function(grunt) {
 				src: '<%= concat.src.dest %>',
 				dest: 'dist/<%= pkg.config.file_name %>.min.js'
 			},
-			gzip: {
+			report: {
 				options: {
 					report: "gzip"
 				},
@@ -173,7 +173,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('build', ['config', 'meta', 'jshint:test', 'src', 'doc']);
 	
 	// To get a report on the minified sizes (must be built already):
-	grunt.registerTask('gzip', ['uglify:gzip']);
+	grunt.registerTask('report', ['uglify:report']);
 	
 	// To be executed before a commit, checking everything:
 	grunt.registerTask('precommit', []);
