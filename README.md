@@ -67,7 +67,7 @@ That's it, you are ready. Now you can use the following commands.
 - `grunt`: build and check everything. You can find built files in the `dist/` folder.
 - `grunt clean`: clean the `dist/` folder.
 - `grunt watch`: when you are editing the files, it will automatically rebuild the needed files when you save them.
-- `grunt report`: reports the minified and gzipped sizes (project must be already built).
+- `grunt report`: reports the minified and gzipped sizes (project must be already built) (results may be a few bytes off).
 
 **Important: don't forget to run `grunt` before you commit to check that everything works.**
 

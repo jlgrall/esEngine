@@ -177,7 +177,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('build', ['config', 'meta', 'jshint:test', 'src', 'doc']);
 	
 	// To get a report on the minified sizes (must be built already):
-	grunt.registerTask('report', ['uglify:report']);
+	grunt.registerTask('report', ['uglify:report', 'uglify:dev', 'string-replace:min']);
 	
 	// To be executed before a commit, checking everything:
 	grunt.registerTask('precommit', []);
