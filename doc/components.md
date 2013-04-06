@@ -66,12 +66,20 @@ You can directly access the attributes and helpers on the component: `myComponen
 ### .$creator
 A reference to the ComponentCreator for this component.
 
+### .$entity
+The entity this component was added to or 0.
+Thus it is truthy only if this component was added to an entity.
+
 ### .$addTo( entity )
 Adds this component to an entity.  
 Throws an error if the component was already added to another entity.
 
+### .$remove()
+Removes this component from its entity. Useful for moving a component from an entity to another.
+Throws an error if the component was already removed.
+
 ### .$dispose()
-Removes this component from its entity and from the ES engine and disposes it. (You must not continue to use this component afterwards, as it may be reused by esEngine to make future components)
+Removes this component from its entity and disposes it. (You must not continue to use this component afterwards, as it will be reused by esEngine to make future components)
 
 
 ## cLink
