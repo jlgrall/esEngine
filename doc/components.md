@@ -46,9 +46,6 @@ Returns a componentCreator for the given ComponentDef.
 ### .def
 A reference to the ComponentDef of this ComponentCreator.
 
-### .name
-Name of the component type.
-
 ### 'ComponentCreator'( args... )
 _(ie. calling a ComponentCreator directly)_  
 **Constructor**: returns a new component from this ComponentCreator.
