@@ -15,8 +15,8 @@ Entity destruction can happen in 2 ways:
 **Constructor**: returns a new entity with the given components.  
 This method is available from `es` and from any bag. It will automatically add the entity to that bag in addition to the default `es.entities` bag.
 
-### {es,bag}.disposeEntity( entity )
-Disposes the given entity and all its components.  
+### {es,bag}.disposeEntity( entity... )
+Disposes the given entities and all their components.  
 This method is available from `es` and from any bag.
 
 

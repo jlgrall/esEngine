@@ -38,22 +38,37 @@ A special Bag containing all the entities managed by this engine. See: es.
 ### .newEntity( component... )
 Creates a new entity and adds it to this bag. See: Entity.
 
-### .disposeEntity( entity )
-Disposes an entity. See: Entity.
+### .disposeEntity( entity... )
+Disposes given entities. See: Entity.
 
-### .add( entity..., [selector] )
+### .add( entity... )
 Adds the given entities to this bag.
-- **entity...**: entities or eLinks, arrays of entities or eLinks and bags.
+- **entity...**: entities or eLinks.
+
+### .addFrom( entity..., [selector] )
+Adds the given entities to this bag.
+- **entity...**: entities or eLinks, arrays of entities or arrays of eLinks and bags.
 - **selector** (optional): only add the entities that are matched by the selector. Also accepts components types directly.
 
-### .remove( entity..., [selector] )
+### .remove( entity... )
 Removes the given entities from this bag.
-- **entity...**: entities or eLinks, arrays of entities or eLinks and bags.
+- **entity...**: entities or eLinks.
+
+### .removeFrom( entity..., [selector] )
+Removes the given entities from this bag.
+- **entity...**: entities or eLinks, arrays of entities or arrays of eLinks and bags.
 - **selector** (optional): only remove the entities that are matched by the selector. Also accepts components types directly.
 
-### .empty( [selector] )
+### .keep( selector )
+Only keep the entities that match the selector.
+- **selector**: only keep the entities that are matched by the selector. Also accepts components types directly.
+
+### .discard( selector )
+Discard all entities that match the selector.
+- **selector**: only remove the entities that are matched by the selector. Also accepts components types directly.
+
+### .clear()
 Removes all entities from this bag.
-- **selector** (optional): only remove the entities that are matched by the selector. Also accepts components types directly.
 
 ### .query( componentType... )
 Creates a new Query. See: Query.
