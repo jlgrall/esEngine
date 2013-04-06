@@ -7,7 +7,7 @@ Components
 Definition for a type of component.  
 Components store data. They don't have any logic in them.  
 But they can have helpers, that is, methods to access or store data but which has no game logic. For example: a Position component can have the helpers setPosition(x, y) or getDistanceTo(position2).  
-A component should only contain datas that can be JSON encoded (ie. no function, no reference to other data)  
+A component can only contain primitive values (undefined, null, booleans, numbers, strings) eLinks, cLinks, arrays and objects. Arrays and objects must be defined empty (ie. they are empty before initialization), and can only contain primitive values, eLinks and cLinks.
 Once a ComponentDef is made, you can inspect its properties, but you must not change nor execute them.  
 Name of components must be unique.
 
@@ -61,7 +61,7 @@ This is relatively slow and unoptimized if you call it repetitively. If you want
 ## Component
 
 A component contains datas, also named the component's attributes. It also has simple getters and setters for the datas also called helpers.  
-You can directly access the attributes and helpers on the component: `myComponent.attr1` or `myComponent.helperX()`. You can directly modify the attributes, but you must never add/remove new properties to components, and you must not modify the helpers. In addition, components offer useful functions prefixed with "$" to prevent conflicts with other attributes and helpers names.
+You can directly access the attributes and helpers on the component: `myComponent.attr1` or `myComponent.helperX()`. You can directly modify the attributes, but you must never add/remove new properties to components, and you must not modify the helpers. In addition, components offer useful functions prefixed with "$" and made non-enumerable to prevent conflicts with other attributes and helpers names.
 
 ### .$creator
 A reference to the ComponentCreator for this component.

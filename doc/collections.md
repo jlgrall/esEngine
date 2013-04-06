@@ -28,12 +28,15 @@ Returns true if both selectors matches the same entities.
 
 A set of entities.
 
+### es.entities
+A special Bag containing all the entities managed by this engine. See: es.
+
 ### es.bag( [name] )
 **Constructor**: returns a new bag.
 - **name** (optional): the name of the bag.
 
-### es.entities
-A special Bag containing all the entities managed by this engine. See: es.
+### .name
+Name of the bag or `undefined`.
 
 ### .newEntity( component... )
 Creates a new entity and adds it to this bag. See: Entity.
