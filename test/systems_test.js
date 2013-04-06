@@ -5,11 +5,13 @@
 var _ = require('lodash');
 
 
-// Start Tests:
+// Tests:
 
 var esEngine = require('../dist/esengine'); 
 
 exports.APITest = function(test) {
+	// SETUP:
+	
 	//test.expect(1);
 	
 	var currentName = function() {
@@ -22,9 +24,6 @@ exports.APITest = function(test) {
 		return currentName.cName;
 	};
 	
-	
-	// STARTING THE TESTS:
-	
 	var cDefs = [],
 		cNames = [],
 		sDef,
@@ -34,6 +33,9 @@ exports.APITest = function(test) {
 		cNames[i] = "S_ComponentName_" + i;
 		cDefs[i] = esEngine.ComponentDef( { name: cNames[i] } );
 	}
+	
+	
+	// STARTING THE TEST:
 	
 	test.ok(_.isFunction(esEngine.SystemDef), "esEngine.SystemDef is a function");
 	
@@ -50,7 +52,7 @@ exports.APITest = function(test) {
 	}, /init/, "A system must have an init function");
 	
 	sDef = esEngine.SystemDef( { name: currentName.next(), cDefs: [], init: function() {} } );
-	test.ok(sDef.name === currentName(), "sDef name is correct");
+	test.strictEqual(sDef.name, currentName(), "sDef name is correct");
 	test.ok(_.isArray(sDef.cDefs) && _.isEmpty(sDef.cDefs), "sDef's cDefs is an empty array");
 	test.ok(_.isFunction(sDef.init), "sDef's init is a function");
 	
@@ -68,7 +70,7 @@ exports.APITest = function(test) {
 	
 	sDef = esEngine.SystemDef( { name: currentName.next(), cDefs: [cNames[0], cDefs[1], cNames[2], cDefs[3]], init: function() {} } );
 	for(i = 0; i < 4; i++) {
-		test.ok(sDef.cDefs[i] === cDefs[i], "sDef's has the correct cDef[" + i + "]");
+		test.strictEqual(sDef.cDefs[i], cDefs[i], "sDef's has the correct cDef[" + i + "]");
 	}
 	
 	

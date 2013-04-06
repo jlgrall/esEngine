@@ -1,10 +1,14 @@
 
-// The prototype for all systemDefs:
-var SystemDefProto = Object_freeze( {} ),
-	esEngine_sDefs = esEngine._sDefs = {};
+var 
+	// esEngine.sDefs, contains all defined SystemDef:
+	esEngine_sDefs = {},
+	
+	// Prototype for all systemDefs:
+	SystemDefProto = Object_freeze( {} );
 
 
-esEngine.SystemDef = function( objectDef ) {
+// esEngine.SystemDef( objectDef )
+var SystemDef = function( objectDef ) {
 	
 	var name = objectDef.name,
 		_cDefs = objectDef.cDefs,
@@ -14,7 +18,9 @@ esEngine.SystemDef = function( objectDef ) {
 	if( !isArray( _cDefs ) ) throw "A system must have a cDefs array.";
 	if( !isFunction( init ) ) throw "A system must have a init function.";
 	
-	// Check the given cDefs, and retrieve the cDef
+	if( name in esEngine_sDefs ) throw "A SystemDef already exists with the name: " + name;
+	
+	// Check the given cDefs, retrieving the cDef
 	// when only its name is given:
 	var _cDefsLength = _cDefs.length,
 		cDefs = [],
@@ -29,19 +35,15 @@ esEngine.SystemDef = function( objectDef ) {
 		cDefs.push( cDef );
 	}
 	
-	if( name in esEngine_sDefs ) throw "A SystemDef already exists with the name: " + name;
+	// Create the systemDef:
+	var sDef = compactCreate( SystemDefProto, defPropsUnwriteable, {
+			name: name
+		}, defPropsFreeze, {
+			cDefs: cDefs,
+			init: init
+		});
 	
-	var sDef = Object_create( SystemDefProto );
-	
-	sDef.name = name;
-	sDef.cDefs = cDefs;
-	sDef.init = init;
-	
-	// Freeze all added properties and the objects they reference:
-	// Note: name is already immutable.
-	definePropertiesUnwriteable( sDef, "name" );
-	freezeProperties( sDef, "cDefs", "init" );
-	
+	// Store the new systemDef:
 	esEngine_sDefs[ name ] = sDef;
 	
 	return sDef;

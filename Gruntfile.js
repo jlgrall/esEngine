@@ -8,20 +8,23 @@ module.exports = function(grunt) {
 		pkg: grunt.file.readJSON('package.json'),
 		// https://github.com/gruntjs/grunt-contrib-jshint
 		jshint: {
-			// configure JSHint (documented at http://www.jshint.com/docs/)
+			// configure JSHint (Documentation: http://www.jshint.com/docs/)
 			options: {
-				node: true,
-				es5: true,
-				smarttabs: true,
-				globals: {
-				}
+				es5: true,				// Code uses ECMAScript 5 syntax
+				smarttabs: true,		// Tabs can be followed by spaces for alignement
+				node: true				// Globals from Node.js
 			},
 			config: ['package.json', 'gruntfile.js'],
 			src: {
 				options: {
+					"-W018": true			// Confusing use of '!'
 				},
 				src: [
 					'src/utils.js',
+					'src/utils-bitarray.js',
+					'src/utils-pool.js',
+					'src/utils-recycledindexedlist.js',
+					'src/utils-indexrecycler.js',
 					'src/engine.js',
 					'src/entities.js',
 					'src/components.js',
@@ -29,10 +32,25 @@ module.exports = function(grunt) {
 					'src/collections.js'
 				]
 			},
-			test: ['test/**/*.js'],
+			test: {
+				options: {
+					strict: true,	// Functions must be in strict mode
+					newcap: false,		// Constructor don't need to start with a capital
+					undef: true		// Warn about undefined variables
+					//unused: true		// Warn about unused variables
+				},
+				src: ['test/**/*.js']
+			},
 			dev: {
 				options: {
-					newcap: false
+					strict: true,		// Functions must be in strict mode
+					newcap: false,		// Constructor don't need to start with a capital
+					undef: true,		// Warn about undefined variables
+					//unused: true,		// Warn about unused variables
+					"-W018": true,			// Confusing use of '!'
+					globals: {
+						define: true	// Glogal: "define" (for AMD's define())
+					}
 				},
 				src: ['<%= concat.src.dest %>']
 			}

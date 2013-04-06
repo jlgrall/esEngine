@@ -1,3 +1,15 @@
+// Export some functions:
+
+esEngine.version = version;
+
+esEngine.ArrayOfBitArray = ArrayOfBitArray;
+esEngine.BufferedIndexRecycler = BufferedIndexRecycler;
+
+esEngine._cDefs = esEngine_cDefs;
+esEngine.ComponentDef = ComponentDef;
+
+esEngine._sDefs = esEngine_sDefs;
+esEngine.SystemDef = SystemDef;
 
 
 // Following part is taken from: https://github.com/jquery/jquery/blob/master/src/exports.js

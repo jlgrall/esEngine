@@ -5,18 +5,26 @@
 var _ = require('lodash');
 
 
-// Start Tests:
+// Tests:
 
 var esEngine = require('../dist/esengine'); 
 
-exports.APITest = function(test){
+exports.APITest = function(test) {
+	// SETUP:
+	
     //test.expect(1);
     
+	
+	// STARTING THE TEST:
+	
     // There is no reliable way to test if esEngine would be
     // added to the global object if it were not loaded by Node.js ?
     
     test.ok(_.isFunction(esEngine), "esEngine is a function");
     
+    var es = esEngine();
+    
+    test.ok(es, "Calling esEngine gives an ES");
     
     test.done();
 };
