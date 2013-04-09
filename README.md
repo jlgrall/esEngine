@@ -2,7 +2,7 @@ esEngine
 =========
 
 
-A JavaScript Entity System with focus on speed and efficiency.
+A JavaScript Entity System with focus on speed and efficiency. **Still in development, no release yet.** 
 
 _Entity Component System_ is often simply referenced as _Entity System_ or _ES_.
 
