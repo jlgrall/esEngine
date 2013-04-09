@@ -46,21 +46,30 @@ Disposes given entities. See: Entity.
 
 ### .add( entity... )
 Adds the given entities to this bag.
-- **entity...**: entities or eLinks.
+- **entity...**: entities only.
 
 ### .addFrom( entity..., [selector] )
 Adds the given entities to this bag.
-- **entity...**: entities or eLinks, arrays of entities or arrays of eLinks and bags.
+- **entity...**: entities or eLinks, arrays of entities, arrays of eLinks and bags.
 - **selector** (optional): only add the entities that are matched by the selector. Also accepts components types directly.
 
 ### .remove( entity... )
 Removes the given entities from this bag.
-- **entity...**: entities or eLinks.
+- **entity...**: entities only.
 
 ### .removeFrom( entity..., [selector] )
 Removes the given entities from this bag.
-- **entity...**: entities or eLinks, arrays of entities or arrays of eLinks and bags.
+- **entity...**: entities or eLinks, arrays of entities, arrays of eLinks and bags.
 - **selector** (optional): only remove the entities that are matched by the selector. Also accepts components types directly.
+
+### .has( entity... )
+Returns true if this bag contains all the given entities.
+- **entity...**: entities only.
+
+### .hasFrom( entity..., [selector] )
+Returns true if this bag contains all the given entities.
+- **entity...**: entities or eLinks, arrays of entities, arrays of eLinks and bags.
+- **selector** (optional): only consider the entities that are matched by the selector. Also accepts components types directly.
 
 ### .keep( selector )
 Only keep the entities that match the selector.
