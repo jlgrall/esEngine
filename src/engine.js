@@ -108,6 +108,7 @@ var esEngine = function() {
 		// This id is used to efficiently store and retrieve components from arrays and maps.
 		// Prototype chain: component -> proto (1 for each componentCreator) -> componentDef.helpers -> ComponentProto
 		var 
+			// Keep all ComponentCreators (simply referred as "creators"):
 			allCreators = RecycledIndexedNamedList({
 				onArrayExpanded: function( length ) {
 					if( length > allEntities.size ) {
@@ -118,10 +119,16 @@ var esEngine = function() {
 					// Removing creators is not in the API.
 				}
 			}),
+			// Shortcuts:
 			allCreatorsArray = allCreators.array,
 			allCreators_byName = allCreators.names,
 			allCreators_byId = allCreators.map,
+			
+			// Array of array of components. First index is the id of the creator,
+			// second index is the id of the entity of the component.
 			allComponents = [],
+			
+			// es.componentCreator( ComponentDef ):
 			componentCreator = function( cDef ) {
 				if( isString( cDef ) ) {
 					if( !esEngine_cDefs[ cDef ] ) throw "No ComponentDef found with name: " + cDef;
@@ -132,23 +139,38 @@ var esEngine = function() {
 				var name = cDef.name,
 					creator = allCreators_byName[ name ];
 				
+				// If creator not found, create and store it:
 				if( !creator ) {
 					
-					var set = cDef._set,
+					var 
+						// Cache reference (used in constr):
+						set = cDef._set,
+						
+						// Component constructor (used directly in the poolFactory)
 						constr = function() {
 							var component = Object_create( proto );
-							set( component );
-							component.$e = 0;
+							set( component );	// Set the default attributes.
+							component.$e = 0;	// The entity of the component (See: component.$entity ).
+							// Now we lock the component:
 							Object_defineProperty( component, "$e", defPropsUnenumerable );
 							Object_preventExtensions( component );
 							return component;
 						},
+						
+						// For the poolFactory (Called by the pool when reusing a component instead of creating a new one):
 						onAcquired = noopFunc,
-						onReleased = function( component ) {
-							if( component.$e !== 0 ) component.$remove();
-						};
+						
+						// For the poolFactory (Called by the pool when the component is disposed):
+						onReleased = noopFunc;
 					
-					var poolDef = poolFactory( constr, cDef.init, onAcquired, onReleased, cDef._reset ),
+					var 
+						// Each creator has its pool, which automatically manages component creation and reuse.
+						// Here we create the pool on top of the component constructor, and we get references to
+						// the pool's functions.
+						poolDef = poolFactory( constr, cDef.init, onAcquired, onReleased, cDef._reset ),
+						poolDef_disposer = poolDef.disposer,
+						
+						// Component prototype, inheriting from cDef.helpers and adding functions specific to the creator.
 						proto = compactCreate( cDef.helpers , defPropsUnenumerableUnwriteable, {
 							$creator: creator = poolDef.acquirer,
 							$addTo: function( entity ) {
@@ -164,11 +186,16 @@ var esEngine = function() {
 								if( entity === 0 ) throw "This component was not added to an entity: " + name;
 								delete components[ entity ];
 								this.$e = 0;
+								// If this is the last component of the entity, dispose the entity:
 								if( allEntities.unset( entity, creatorId ) === 0 ) {
 									disposeOneEmptyEntity( entity );
 								}
 							},
-							$dispose: poolDef.disposer,
+							$dispose: function() {
+								// Check if we need to be removed:
+								if( this.$e !== 0 ) this.$remove();
+								poolDef_disposer.call( this );
+							}
 						});
 					
 					// Store the new creator and implicitly give it an id:
@@ -177,6 +204,7 @@ var esEngine = function() {
 					var creatorId = creator._id,
 						components = allComponents[ creatorId ] = {};
 					
+					// Add properties and methods to the creator:
 					compactDefine( creator, defPropsUnenumerableUnwriteable, {
 						_id: creatorId
 					}, defPropsUnwriteable, {
