@@ -38,6 +38,9 @@ A special Bag containing all the entities managed by this engine. See: es.
 ### .name
 Name of the bag or `undefined`.
 
+### .length
+Number of entities in the bag.
+
 ### .newEntity( component... )
 Creates a new entity and adds it to this bag. See: Entity.
 
