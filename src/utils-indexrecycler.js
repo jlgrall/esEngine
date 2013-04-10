@@ -82,9 +82,17 @@ var
 			},
 			
 			// Create the IndexRecycler:
-			indexRecycler = compactCreate( IndexRecyclerProto, defPropsUnwriteable, {
+			indexRecycler = compactCreate( IndexRecyclerProto, defDescriptors, {
+				used: {
+					get: function() {
+						return nbUsed;
+					},
+					set: unsupportedOperationFunc
+				}
+			}, defPropsUnwriteable, {
 				acquire: function() {
 					var index = nextIndex();
+					nbUsed++;
 					if( higherUsed < index ) higherUsed = index;
 					onAcquired( index, array );
 					return index;
@@ -92,6 +100,7 @@ var
 				release: function( index ) {
 					onReleased( index, array );
 					releasedIndex( index );
+					nbUsed--;
 					if( index === higherUsed ) {
 						do {
 							higherUsed--;

@@ -29,8 +29,12 @@ var esEngine = function() {
 				isAvailable: function( index ) {
 					return allEntities_bitsSet[ index ] === -1;
 				},
-				expandArray: function( expandAmount ) {
-					return allEntities.length += expandAmount;
+				expandArray: function( expandAmount, length, expandedLength, array ) {
+					allEntities.length += expandAmount;
+					for( var i = length; i < expandedLength; i++ ) {
+						allEntities_bitsSet[i] = -1;
+					}
+					return expandedLength;
 				},
 				// When there is no more entity to be reused, creates 16 new
 				// entities at the same time.
@@ -100,7 +104,7 @@ var esEngine = function() {
 			
 			// Acquire and discard the entity with id 0,
 			// because entity ids must start at 1
-			entitiesManager.acquire();
+			if( entitiesManager.acquire() !== 0 ) throw "First entity must be 0";
 		
 		
 		// #### Create structures for managing components.
@@ -270,6 +274,13 @@ var esEngine = function() {
 			}, defPropsUnenumerableUnwriteable, {
 				_es: es,
 				name: "*"
+			}, defDescriptors, {
+				length: {
+					get: function() {
+						// - 1 because the entity 0 doesn't count:
+						return entitiesManager.used - 1;
+					}
+				}
 			});
 		// All these methods will throw if called:
 		entities.add =
