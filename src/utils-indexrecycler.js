@@ -165,7 +165,8 @@ var
 			// Keep track of the lowest index available:
 			lowerAvailable = 0,
 			buffer = [],
-			bufferCount = 0;
+			bufferCount = 0,
+			bufferStart = 0;
 		
 		var 
 			// bufferSize must be greater than 0:
@@ -187,14 +188,15 @@ var
 			
 			// Returns the next index to be acquired:
 			nextIndex = function() {
-				if( bufferCount === 0 ) {
+				if( bufferCount === bufferStart ) {
+					bufferCount = bufferStart = 0;
 					fillBuffer();
 					if( bufferCount === 0 ) {
 						lowerAvailable = makeNextAvailable();
 						return lowerAvailable++;
 					}
 				}
-				return buffer[ --bufferCount ];
+				return buffer[ bufferStart++ ];
 			},
 			// Called with the released indexes:
 			releasedIndex = function( index ) {
