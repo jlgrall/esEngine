@@ -36,13 +36,13 @@ var esEngine = function() {
 					}
 					return expandedLength;
 				},
-				// When there is no more entity to be reused, creates 16 new
+				// When there is no more entity to be reused, creates 128 new
 				// entities at the same time.
-				expandAmount: 32,
+				expandAmount: 128,
 				// When there are unused entities at the end, shrink the array
-				// by 64, but not before there are 512 unused at the end.
+				// by 256, but not before there are more than 512 unused at the end.
 				maxTrailingAvailable: 512,
-				reduceAmount: 64,
+				reduceAmount: 256,
 				onAcquired: function( index ) {
 					allEntities_bitsSet[ index ] = 0;
 				},
