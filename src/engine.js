@@ -69,7 +69,7 @@ var esEngine = function() {
 					disposeOneEntity( args[i] );
 				}
 			},
-			// Internally used, instead of disposeEntity(),
+			// Internally used instead of disposeEntity(),
 			// because most of the time we dispose entities one by one.
 			disposeOneEntity = function( entity ) {
 				var bagsLength = allBagsArray.length;
@@ -80,7 +80,7 @@ var esEngine = function() {
 					allBagsArray[j].removeOne( entity );
 				}
 				// Dispose all components of the entity:
-				entitiesManager.eachSet( entity, disposeComponent );
+				allEntities.eachSet( entity, disposeComponent );
 			},
 			// Internal. Disposes entities that have no more component.
 			disposeOneEmptyEntity = function( entity ) {

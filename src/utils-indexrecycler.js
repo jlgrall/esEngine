@@ -37,6 +37,7 @@ var
 				return expandedLength;
 			},
 			
+			// Arguments: expandedLength
 			onArrayExpanded = options.onArrayExpanded || noopFunc,
 			
 			// Tells the default reduceArray() function what is the maximum number of available
@@ -55,6 +56,7 @@ var
 				return array.length -= reduceAmount;
 			},
 			
+			// Arguments: reducedLength
 			onArrayReduced = options.onArrayReduced || noopFunc,
 			
 			// onAcquired is called for every acquired index.
@@ -63,14 +65,16 @@ var
 		
 			// onAcquired is called for every released index.
 			// Arguments: index, array
-			onReleased = options.onAcquired || noopFunc;
+			onReleased = options.onReleased || noopFunc;
 		
 		
 		var 
 			// Keep track of the higher used index, so we know when the array can be shrunk:
-			higherUsed = length - 1,
+			higherUsed = -1,
 			
-			makeNextAvailable= function() {
+			nbUsed = 0,
+			
+			makeNextAvailable = function() {
 				var next = length;
 				length = expandArray( expandAmount, length, length + expandAmount, array );
 				onArrayExpanded( length );

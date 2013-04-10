@@ -139,7 +139,7 @@ exports.APITest = function(test) {
 	
 	test.throws(function() {
 		comp1.$entity = 100;
-	}, /entity/, "The entity of a component cannot be modified");
+	}, /Unsupported/, "The entity of a component cannot be modified");
 	
 	test.strictEqual(comp1.$entity, 0, "The component was not added to an entity");
 	entity1 = es.newEntity(comp1);

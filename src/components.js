@@ -12,7 +12,7 @@ var
 			return this.$e;
 		},
 		set $entity(val) {
-			throw "You cannot set a component's entity";
+			unsupportedOperationFunc();
 		}
 	});
 

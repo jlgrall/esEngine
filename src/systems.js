@@ -16,7 +16,7 @@ var SystemDef = function( objectDef ) {
 	
 	if( !isString( name ) ) throw "A system must have a name.";
 	if( !isArray( _cDefs ) ) throw "A system must have a cDefs array.";
-	if( !isFunction( init ) ) throw "A system must have a init function.";
+	if( !isFunction( init ) ) throw "A system must have an init function.";
 	
 	if( name in esEngine_sDefs ) throw "A SystemDef already exists with the name: " + name;
 	
