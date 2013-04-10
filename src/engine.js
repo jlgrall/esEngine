@@ -234,13 +234,22 @@ var esEngine = function() {
 				// Automatically adds the new entity to itself:
 				newEntity: function() {
 					var entity = newEntity.apply( es, arguments );
-					this._e[ entity ] = true;
+					this.addOne( entity );
 					return entity;
 				},
 				disposeEntity: disposeEntity,
 				dispose: function() {
 					this.clear();
 					allBags.remove( this );
+				}
+			}, defPropsUnenumerableUnwriteable, {
+				_es: es
+			}, defDescriptors, {
+				length: {
+					get: function() {
+						return this._length;
+					},
+					set: unsupportedOperationFunc
 				}
 			}),
 			// Constructor for all bags (except es.entities):
@@ -250,11 +259,11 @@ var esEngine = function() {
 				var bag = compactCreate( BagESProto, defProps, {
 					name: name
 				}, defPropsUnenumerable, {
-					_id: -1	// Will be set in allBags.add()
+					_id: -1,	// Will be set in allBags.add()
+					_length: 0
 				}, defPropsUnenumerableUnwriteable, {
 					// Map of contained entities:
-					_e: {},
-					_es: es
+					_e: {}
 				});
 				
 				allBags.add( bag );
@@ -267,12 +276,27 @@ var esEngine = function() {
 		// Many methods are deactivated because they don't make sense.
 		// Prototype chain: entities -> BagESProto -> BagProto
 		var entities = compactCreate( BagESProto, defProps, {
+				newEntity: newEntity,
 				disposeEntitiesFrom: function() {},
+				has: function() {
+					var args = arguments,
+						length = args.length,
+						nbEntities = allEntities.length,
+						i;
+					for( i = 0; i < length; i++ ) {
+						if( args[i] >= nbEntities || allEntities_bitsSet[ args[i] ] === -1 ) {
+							return false;
+						}
+					}
+					return true;
+				},
+				hasOne: function( entity ) {
+					return entity < allEntities.length && allEntities_bitsSet[ entity ] !== -1;
+				},
 				keepEntities: function() {},
 				discardEntities: function() {},
 				clearEntities: function() {}
 			}, defPropsUnenumerableUnwriteable, {
-				_es: es,
 				name: "*"
 			}, defDescriptors, {
 				length: {
