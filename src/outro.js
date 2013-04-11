@@ -21,9 +21,6 @@ if ( typeof module === "object" && typeof module.exports === "object" ) {
 	// upon in the Node module world.
 	module.exports = esEngine;
 } else {
-	// Otherwise expose esEngine to the global object as usual
-	window.esEngine = esEngine;
-
 	// Register as a named AMD module, since esEngine can be concatenated with other
 	// files that may use define, but not via a proper concatenation script that
 	// understands anonymous AMD modules. A named AMD is safest and most robust
@@ -34,6 +31,11 @@ if ( typeof module === "object" && typeof module.exports === "object" ) {
 	if ( typeof define === "function" && define.amd ) {
 		define( "esengine", [], function () { return esEngine; } );
 	}
+}
+// If there is a window object, that at least has a document property,
+// define esEngine identifier.
+if ( typeof window === "object" && typeof window.document === "object" ) {
+	window.esEngine = esEngine;
 }
 
 })( this, Object, String, Array );
