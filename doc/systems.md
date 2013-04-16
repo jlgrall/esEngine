@@ -35,7 +35,7 @@ Function that initialises the new system.
 
 A system has a `.execute()` function which is called each time the system is run. It can also have other user added methods.
 
-### es.newSystem( SystemDef, [bag], args... )
+### es.system( SystemDef, [bag], args... )
 **Constructor**: returns a new system from the given SystemDef.  
 Throws an error if the tag is already taken for the system name.
 - **SystemDef**: can be a reference to a SystemDef or the name of a SystemDef as a string:

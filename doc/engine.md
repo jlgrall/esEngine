@@ -39,7 +39,7 @@ Disposes an entity. See: Entity.
 ### es.componentCreator( ComponentName | ComponentDef )
 Get a ComponentCreator. See: ComponentCreator.
 
-### es.newSystem( SystemDef, [bag], args... )
+### es.system( SystemDef, [bag], args... )
 Creates a new system. See: System.
 
 ### es.systemGroup( name )
