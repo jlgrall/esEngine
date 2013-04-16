@@ -114,8 +114,8 @@ var
 			},
 			set: function( newLength ) {
 				var arr = this._arr,
-					bitsSet = this._bitsSet,
 					nbValues = arr.length,
+					bitsSet = this._bitsSet,
 					length = this._length,
 					values,
 					v, i;

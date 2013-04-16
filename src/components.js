@@ -19,32 +19,32 @@ var
 
 var ComponentDef = function( objectDef ) {
 	
-	var name = objectDef.name;
+		var name = objectDef.name;
 	
-	if( !isString( name ) ) throw "A component must have a name.";
-	if( name in esEngine_cDefs ) throw "A ComponentDef already exists with the name: " + name;
+		if( !isString( name ) ) throw "A component must have a name.";
+		if( name in esEngine_cDefs ) throw "A ComponentDef already exists with the name: " + name;
 	
-	var 
-		// Analyse the attributes, checking if they are correct:
-		attr = objectDef.attr || {},
-		analyse = analyseAttr( name, attr ),
+		var 
+			// Analyse the attributes, checking if they are correct:
+			attr = objectDef.attr || {},
+			analyse = analyseAttr( name, attr ),
 		
-		// Create the componentDef:
-		cDef = compactCreate( ComponentDefProto, defPropsUnwriteable, {
-			name: name,
-			init: objectDef.init || noopFunc,
-			_set: objectDef.set || makeComponentDefSet( attr, analyse ),
-			_reset: objectDef.reset || makeComponentDefReset( attr, analyse )
-		}, defPropsFreeze, {
-			attr: attr,
-			helpers: compactCreate( ComponentProto, defProps, objectDef.helpers )
-		});
+			// Create the componentDef:
+			cDef = compactCreate( ComponentDefProto, defPropsUnwriteable, {
+				name: name,
+				init: objectDef.init || noopFunc,
+				_set: objectDef.set || makeComponentDefSet( attr, analyse ),
+				_reset: objectDef.reset || makeComponentDefReset( attr, analyse )
+			}, defPropsFreeze, {
+				attr: attr,
+				helpers: compactCreate( ComponentProto, defProps, objectDef.helpers )
+			});
 	
-	// Store the new componentDef:
-	esEngine_cDefs[ name ] = cDef;
+		// Store the new componentDef:
+		esEngine_cDefs[ name ] = cDef;
 	
-	return cDef;
-};
+		return cDef;
+	};
 
 
 // Analyse the definitions of the attributes for the future components.

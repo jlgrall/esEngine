@@ -122,16 +122,17 @@ exports.APITest = function(test) {
 	test.ok(entities.has.apply(entities, testEntities), "es.entities doesn't have the last removed entity");
 	test.ok(!bag1.has.apply(bag1, testEntities), "bag1 has not the entities");
 	bag1.add.apply(bag1, testEntities);
-	// Can add twice:
+	// Can add twice the same entity:
 	bag1.add(testEntities[0]);
 	test.strictEqual(bag1.length, 30*1 + testEntities.length, "Bag1 contains the added entities");
 	test.ok(bag1.has.apply(bag1, testEntities), "bag1 has the added entities");
 	bag1.remove.apply(bag1, testEntities);
-	// Can remove twice:
+	// Can remove twice the same entity:
 	bag1.remove(testEntities[0]);
 	test.strictEqual(bag1.length, 30*1, "Bag1 contains doesn't contain the removed entities");
 	test.ok(!bag1.has.apply(bag1, testEntities), "bag1 has not the removed entities");
 	
+	// bag.clear():
 	test.ok(bag1.has(5), "bag1 has entity 5");
 	bag1.clear();
 	test.strictEqual(bag1.length, 0, "bag1 was cleared");

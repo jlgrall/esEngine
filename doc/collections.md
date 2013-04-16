@@ -12,7 +12,7 @@ A selector that matches any entity.
 ### es.selector( objectDef | componentType... )
 **Constructor**: returns a new selector or an existing selector if the description matches an existing one.  
 Accepts either an objectDef or a list of component types.
-- **objectDef**: an object with the following properties:
+- **objectDef**: an object with one of the following properties:
     - **has** (optional): an array of ComponentDefs or ComponentCreators or component names that the entities must have.
     - **not** (optional): an array of ComponentDefs or ComponentCreators or component names that the entities must **not** have.
 - **componentType...**: list of ComponentDefs or ComponentCreators or component names that the entities must have. (ie. a shorthand for using only **has** from the objectDef)
@@ -53,7 +53,7 @@ Adds the given entities to this bag.
 
 ### .addFrom( entity..., [selector] )
 Adds the given entities to this bag.
-- **entity...**: entities or eLinks, arrays of entities, arrays of eLinks and bags.
+- **entity...**: entities, eLinks, arrays of entities, arrays of eLinks and bags.
 - **selector** (optional): only add the entities that are matched by the selector. Also accepts components types directly.
 
 ### .remove( entity... )
@@ -62,7 +62,7 @@ Removes the given entities from this bag.
 
 ### .removeFrom( entity..., [selector] )
 Removes the given entities from this bag.
-- **entity...**: entities or eLinks, arrays of entities, arrays of eLinks and bags.
+- **entity...**: entities, eLinks, arrays of entities, arrays of eLinks and bags.
 - **selector** (optional): only remove the entities that are matched by the selector. Also accepts components types directly.
 
 ### .has( entity... )
@@ -71,7 +71,7 @@ Returns true if this bag contains all the given entities.
 
 ### .hasFrom( entity..., [selector] )
 Returns true if this bag contains all the given entities.
-- **entity...**: entities or eLinks, arrays of entities, arrays of eLinks and bags.
+- **entity...**: entities, eLinks, arrays of entities, arrays of eLinks and bags.
 - **selector** (optional): only consider the entities that are matched by the selector. Also accepts components types directly.
 
 ### .keep( selector )

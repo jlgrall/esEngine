@@ -1,6 +1,8 @@
 var poolFactory = function( constr, init, onAcquired, onReleased, reset, capacity ) {
-		if(!reset) reset = idFunc;
-		if(!capacity) capacity = 20;
+
+		if( !reset ) reset = idFunc;
+		if( !capacity ) capacity = 20;
+		
 		var stack = [],
 			count = 0,
 			created= 0,
@@ -10,51 +12,51 @@ var poolFactory = function( constr, init, onAcquired, onReleased, reset, capacit
 				get capacity() {
 					return capacity;
 				},
-				set capacity(val) {
-					if(val < stack.length) {
+				set capacity( val ) {
+					if( val < stack.length ) {
 						stack.length = val;
 					}
 					capacity = val;
 				},
-				drop: function(nb) {
-					if(nb === undefined || nb > count) nb = count;
-					while(nb-- > 0) {
-						stack[--count] = null;
+				drop: function( nb ) {
+					if( nb === undefined || nb > count ) nb = count;
+					while( nb-- > 0 ) {
+						stack[ --count ] = null;
 					}
 				},
 				get created() { return created; },
-				set created(val) { created = val; },
+				set created( val ) { created = val; },
 				get dropped() { return dropped; },
-				set dropped(val) { dropped = val; }
+				set dropped( val ) { dropped = val; }
 			};
 		return {
 			acquirer: function() {
 				var obj;
 				if( count > 0 ) {
-					obj = stack[--count];
-					stack[count] = null;
+					obj = stack[ --count ];
+					stack[ count ] = null;
 				}
 				else {
 					obj = constr();
 					created++;
 				}
-				init.apply(obj, arguments);
-				onAcquired(obj);
+				init.apply( obj, arguments );
+				onAcquired( obj );
 				return obj;
 			},
-			releaser: function(obj) {
-				onReleased(obj);
-				if(count < capacity) {
-					reset(obj);
-					stack[count++] = obj;
+			releaser: function( obj ) {
+				onReleased( obj );
+				if( count < capacity ) {
+					reset( obj );
+					stack[ count++ ] = obj;
 				}
 				else dropped++;
 			},
 			disposer: function() {
-				onReleased(this);
-				if(count < capacity) {
-					reset(this);
-					stack[count++] = this;
+				onReleased( this );
+				if( count < capacity ) {
+					reset( this );
+					stack[ count++ ] = this;
 				}
 				else dropped++;
 			},
@@ -68,14 +70,14 @@ var poolFactory = function( constr, init, onAcquired, onReleased, reset, capacit
 			releaseName = options.releaseName || "release",
 			disposeName = options.disposeName || "dispose",
 			proto = options.proto;
-		klass[acquireName] = def.acquirer;
-		klass[releaseName] = def.releaser;
-		if(proto) proto[disposeName] = def.disposer;
+		klass[ acquireName ] = def.acquirer;
+		klass[ releaseName ] = def.releaser;
+		if( proto ) proto[ disposeName ] = def.disposer;
 		klass._pool = def.pool;
 		return klass;
 	},
 	// The class for the pools:
 	Pool = {},
-	pool = function(options) {
-		return attachPool(Object_create(Pool), options);
+	pool = function( options ) {
+		return attachPool( Object_create( Pool ), options );
 	};

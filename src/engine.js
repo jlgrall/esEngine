@@ -229,7 +229,7 @@ var esEngine = function() {
 		// Prototype chain: bag -> BagESProto -> BagProto
 		var allBags = RecycledIndexedList(),
 			allBagsArray = allBags.array,
-			// Methods available on all bags and on es.entities:
+			// Prototype for all bags of this es (and for es.entities):
 			BagESProto = compactCreate( BagProto, defProps, {
 				// Automatically adds the new entity to itself:
 				newEntity: function() {
@@ -296,7 +296,7 @@ var esEngine = function() {
 				keepEntities: function() {},
 				discardEntities: function() {},
 				clearEntities: function() {}
-			}, defPropsUnenumerableUnwriteable, {
+			}, defPropsUnwriteable, {
 				name: "*"
 			}, defDescriptors, {
 				length: {

@@ -39,12 +39,14 @@ exports.APITest = function(test) {
 		esEngine.ComponentDef( {} );
 	}, /name/, "A component must have a name");
 	
+	// esEngine.ComponentDef() with simple definition:
 	cDef0 = esEngine.ComponentDef( { name: currentName.next() } );
 	test.strictEqual(cDef0.name, currentName(), "cDef0 accepts only a name");
 	test.ok(_.isObject(cDef0.attr) && _.isEmpty(cDef0.attr), "cDef0's default attr is an empty object");
 	test.ok(_.isFunction(cDef0.init), "cDef0's default init is a function");
 	test.ok(_.isObject(cDef0.helpers) && _.isEmpty(cDef0.helpers), "cDef0's default helpers is an empty object");
 	
+	// esEngine.ComponentDef() with complete definition:
 	cDef1 = esEngine.ComponentDef({
 		name: currentName.next(),
 		attr: {
