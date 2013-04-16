@@ -175,4 +175,12 @@ var
 		var args = arguments;
 		args[0] = Object_create( proto );
 		return compactDefine.apply( undefined, args );
+	},
+	setProto = function( prototype, constructor ) {
+		// Allow the use of instanceof with components:
+		constructor.prototype = prototype;
+		// Also set the correct constructor (not necessary, but good practice):
+		prototype.constructor = constructor;
+	
+		return constructor;
 	};

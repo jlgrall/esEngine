@@ -38,6 +38,9 @@ exports.APITest = function(test) {
 	var eLink0 = es.eLink(),
 		eLink1 = es.eLink(entity);
 	
+	test.ok(eLink0 instanceof es.eLink, "Can use 'instanceof' with objects created by es.eLink()");
+    test.strictEqual(eLink0.constructor, es.eLink, "Correct constructor for objects created by es.eLink()");
+	
 	test.strictEqual(eLink0.e, 0, "eLink0 doesn't link to an entity");
 	test.strictEqual(eLink1.e, entity, "eLink1 links to comp1");
 	

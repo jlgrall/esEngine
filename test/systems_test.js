@@ -56,6 +56,9 @@ exports.APITest = function(test) {
 	test.ok(_.isArray(sDef.cDefs) && _.isEmpty(sDef.cDefs), "sDef's cDefs is an empty array");
 	test.ok(_.isFunction(sDef.init), "sDef's init is a function");
 	
+	test.ok(sDef instanceof esEngine.SystemDef, "Can use 'instanceof' with objects created by esEngine.SystemDef()");
+    test.strictEqual(sDef.constructor, esEngine.SystemDef, "Correct constructor for objects created by esEngine.SystemDef()");
+	
 	test.throws(function() {
 		esEngine.SystemDef( { name: currentName(), cDefs: [], init: function() {} } );
 	}, /exists/, "2 systems cannot have the same name");

@@ -59,6 +59,9 @@ exports.APITest = function(test) {
 		i, j;
 	
 	
+    test.ok(entities instanceof es.bag, "Can use 'instanceof' with objects created by es.bag()");
+    test.strictEqual(entities.constructor, es.bag, "Correct constructor for objects created by es.bag()");
+	
 	test.strictEqual(entities.name, "*", "es.entities.name is \"*\"");
 	test.throws(function() {
 		entities.name = "New name";
@@ -88,6 +91,9 @@ exports.APITest = function(test) {
 	test.throws(function() {
 		entities.dispose();
 	}, /Unsupported/, "es.entities cannot be disposed");
+	
+    test.ok(products instanceof es.bag, "Can use 'instanceof' with objects created by es.bag()");
+    test.strictEqual(products.constructor, es.bag, "Correct constructor for objects created by es.bag()");
 	
 	test.strictEqual(products.name, "products", "products.name is \"products\"");
 	products.name = "New name";
@@ -130,6 +136,12 @@ exports.APITest = function(test) {
 		selProduct = es.selector( cDefProduct ),
 		selRareProduct = es.selector( cDefProduct, cDefRare ),
 		selRareProductNotUsed = es.selector( { has: [ cDefProduct, cDefRare ], not: [ cDefUsed ] } );
+	
+    test.ok(anySelector instanceof es.selector, "Can use 'instanceof' with objects created by es.selector()");
+    test.strictEqual(anySelector.constructor, es.selector, "Correct constructor for objects created by es.selector()");
+	
+    test.ok(selProduct instanceof es.selector, "Can use 'instanceof' with objects created by es.selector()");
+    test.strictEqual(selProduct.constructor, es.selector, "Correct constructor for objects created by es.selector()");
 	
 	// selector.equals():
 	test.ok(!selProduct.equals(anySelector), "selProduct not equals anySelector");

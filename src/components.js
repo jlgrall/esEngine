@@ -4,10 +4,10 @@ var
 	esEngine_cDefs = {},
 	
 	// Prototype for all componentDefs:
-	ComponentDefProto = Object_freeze( {} ),
+	ComponentDefProto = {},
 	
 	// esEngine.ComponentDef( objectDef ):
-	ComponentDef = function( objectDef ) {
+	ComponentDef = setProto( ComponentDefProto, function( objectDef ) {
 	
 		var name = objectDef.name;
 	
@@ -34,7 +34,9 @@ var
 		esEngine_cDefs[ name ] = cDef;
 	
 		return cDef;
-	};
+	});
+
+Object_freeze( ComponentDefProto );
 
 
 // Analyse the definitions of the attributes for the future components.
@@ -177,7 +179,7 @@ var
 	
 	// es.cLink( component ).
 	// Setup the cLink pool on top of the cLinkProto.
-	cLink = (function() {
+	cLink = setProto( cLinkProto, (function() {
 		var instanceProperties = {
 				_c: {
 					writable: true,
@@ -220,8 +222,8 @@ var
 				set: notAnELinkFunc,
 			}
 		});
-		// Lock the cLinkProto:
-		Object_freeze( cLinkProto );
 		
 		return poolDef.acquirer;
-	})();
+	})() );
+
+Object_freeze( cLinkProto );

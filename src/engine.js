@@ -14,7 +14,7 @@ var
 // - Selectors
 // - Bags
 // - es.entities
-var esEngine = function() {
+var esEngine = setProto( ESProto, function() {
 		
 		// #### Create the "es" that will be returned:
 		var es = Object_create( ESProto );
@@ -146,7 +146,7 @@ var esEngine = function() {
 				capacity: 256
 			}),
 			// Prototype for all eLinks of this es:
-			eLinkESProto = compactCreate(eLinkProto, defDescriptors, {
+			eLinkESProto = compactCreate( eLinkProto, defDescriptors, {
 				e: {
 					enumerable: true,	// TODO; why doesn't it work ? "e" is not enumerable !
 					get: function() {
@@ -174,7 +174,7 @@ var esEngine = function() {
 			}),
 			// es.eLink( entity ).
 			// Setup the eLink pool on top of the eLinkESProto.
-			eLink = (function() {
+			eLink = setProto( eLinkESProto, (function() {
 				var instanceProperties = {
 						_e: {
 							writable: true,
@@ -217,11 +217,11 @@ var esEngine = function() {
 						set: notACLinkFunc,
 					}
 				});
-				// Lock the eLinkESProto:
-				Object_freeze( eLinkESProto );
 				
 				return poolDef.acquirer;
-			})();
+			})() );
+		
+		Object_freeze( eLinkESProto );
 		
 		
 		
@@ -355,6 +355,8 @@ var esEngine = function() {
 							}
 						});
 					
+					setProto( proto, creator );
+					
 					// Store the new creator and implicitly give it an id:
 					allCreators.add( name, creator );
 					
@@ -419,7 +421,7 @@ var esEngine = function() {
 				}
 			}),
 			// es.selector():
-			selector = function() {
+			Selector = setProto( SelectorESProto, function() {
 				var args = arguments,
 					args0 = args[0],
 					has = emptyArray,
@@ -475,7 +477,7 @@ var esEngine = function() {
 				}
 				
 				return selector;
-			};
+			});
 			
 		// Reserve the id 0 as a working space for temporary datas,
 		// and id 1 for anySelector.
@@ -519,7 +521,7 @@ var esEngine = function() {
 				}
 			}),
 			// Constructor for all bags (except es.entities):
-			bag = function( name ) {
+			Bag = setProto( BagESProto, function( name ) {
 				if( !isString( name ) && name !== undefined ) throw "Bag name must be a string (or undefined): " + name;
 				
 				var bag = compactCreate( BagESProto, defProps, {
@@ -535,7 +537,7 @@ var esEngine = function() {
 				allBags.add( bag );
 				
 				return bag;
-			};
+			});
 		
 		
 		
@@ -604,8 +606,8 @@ var esEngine = function() {
 				disposeEntity: disposeEntity,
 				componentCreator: componentCreator,
 				cLink: cLink,
-				selector: selector,
+				selector: Selector,
 				anySelector: anySelector,
-				bag: bag
+				bag: Bag
 			});
-	};
+	});

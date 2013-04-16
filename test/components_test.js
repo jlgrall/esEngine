@@ -46,6 +46,9 @@ exports.APITest = function(test) {
 	test.ok(_.isFunction(cDef0.init), "cDef0's default init is a function");
 	test.ok(_.isObject(cDef0.helpers) && _.isEmpty(cDef0.helpers), "cDef0's default helpers is an empty object");
 	
+	test.ok(cDef0 instanceof esEngine.ComponentDef, "Can use 'instanceof' with objects created by esEngine.ComponentDef()");
+    test.strictEqual(cDef0.constructor, esEngine.ComponentDef, "Correct constructor for objects created by esEngine.ComponentDef()");
+	
 	// esEngine.ComponentDef() with complete definition:
 	cDef1 = esEngine.ComponentDef({
 		name: currentName.next(),
@@ -96,6 +99,9 @@ exports.APITest = function(test) {
 	
 	comp0 = cCreator0();
 	comp1 = cCreator1();
+	
+	test.ok(comp0 instanceof cCreator0, "Can use 'instanceof' with objects created by creator()");
+    test.strictEqual(comp0.constructor, cCreator0, "Correct constructor for objects created by creator()");
 	
 	test.strictEqual(comp1.$creator, cCreator1, "component.$creator is the correct ComponentCreator");
 	
@@ -196,6 +202,9 @@ exports.APITest = function(test) {
 	comp1.$addTo(entity1);
 	var cLink0 = es.cLink(),
 		cLink1 = es.cLink(comp1);
+	
+	test.ok(cLink0 instanceof es.cLink, "Can use 'instanceof' with objects created by es.cLink()");
+    test.strictEqual(cLink0.constructor, es.cLink, "Correct constructor for objects created by es.cLink()");
 	
 	test.strictEqual(cLink0.c, null, "cLink0 doesn't link to a component");
 	test.strictEqual(cLink1.c, comp1, "cLink1 links to comp1");

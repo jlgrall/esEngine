@@ -26,5 +26,8 @@ exports.APITest = function(test) {
     
     test.ok(es, "Calling esEngine gives an ES");
     
+    test.ok(es instanceof esEngine, "Can use 'instanceof' with objects created by esEngine()");
+    test.strictEqual(es.constructor, esEngine, "Correct constructor for objects created by esEngine()");
+    
     test.done();
 };

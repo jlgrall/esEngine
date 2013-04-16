@@ -4,10 +4,10 @@ var
 	esEngine_sDefs = {},
 	
 	// Prototype for all systemDefs:
-	SystemDefProto = Object_freeze( {} ),
+	SystemDefProto = {},
 	
 	// esEngine.SystemDef( objectDef ):
-	SystemDef = function( objectDef ) {
+	SystemDef = setProto( SystemDefProto, function( objectDef ) {
 	
 		var name = objectDef.name,
 			_cDefs = objectDef.cDefs,
@@ -46,4 +46,6 @@ var
 		esEngine_sDefs[ name ] = sDef;
 	
 		return sDef;
-	};
+	});
+
+Object_freeze( SystemDefProto );
