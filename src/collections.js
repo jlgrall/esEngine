@@ -71,7 +71,29 @@ var
 		each: function( callback, thisArg ) {
 			var entities = this._e;
 			for( var entity in entities ) {
+				callback.call( thisArg, entity, this );
+			}
+		},
+		eachSelector: function( selector, callback, thisArg ) {
+			var entities = this._e;
+			for( var entity in entities ) {
+				if( selector.matchesOne( entity ) ) {
+					callback.call( thisArg, entity, this );
+				}
+			}
+		},
+		eachUntil: function( callback, thisArg ) {
+			var entities = this._e;
+			for( var entity in entities ) {
 				if( callback.call( thisArg, entity, this ) === false ) return false;
+			}
+		},
+		eachSelectorUntil: function( selector, callback, thisArg ) {
+			var entities = this._e;
+			for( var entity in entities ) {
+				if( selector.matchesOne( entity ) ) {
+					if( callback.call( thisArg, entity, this ) === false ) return false;
+				}
 			}
 		},
 		clear: function() {
@@ -94,12 +116,7 @@ var
 				entity,
 				i, j,
 				result,
-				eachCallback = hasSelector ? function( entity ) {
-					if( selector.matches( entity ) ) {
-						result = action.call( this, entity );
-						if( result !== continueResult ) return false;
-					}
-				} : function( entity ) {
+				eachCallback = function( entity ) {
 					result = action.call( this, entity );
 					if( result !== continueResult ) return false;
 				};
@@ -115,7 +132,7 @@ var
 				}
 				if( arg > 0 ) {
 					entity = arg;
-					if( !selector || selector.matches( entity ) ) {
+					if( !selector || selector.matchesOne( entity ) ) {
 						result = action.call( this, entity );
 						if( result !== continueResult ) return result;
 					}
@@ -128,17 +145,28 @@ var
 							entity = entity.e;
 							if( entity === 0 ) continue;
 						}
-						if( !selector || selector.matches( entity ) ) {
+						if( !selector || selector.matchesOne( entity ) ) {
 							result = action.call( this, entity );
 							if( result !== continueResult ) return result;
 						}
 					}
 				}
 				else if( isPrototypeOf( BagProto, arg ) ) {
-					if( arg.each( eachCallback, this ) === false ) return result;
+					if( hasSelector ){
+						if( arg.eachSelectorUntil( selector, eachCallback, this ) === false ) return result;
+					}
+					else {
+						if( arg.eachUntil( eachCallback, this ) === false ) return result;
+					}
 				}
 				else throw "This is not a collection of entities: " + arg;
 			}
 			return endResult;
 		}
+	});
+
+
+var 
+	// Prototype for all Queries:
+	QueryProto = compactDefine({
 	});

@@ -137,6 +137,19 @@ var
 		}
 	});
 
+// Component utils:
+var toCreators = function( es, array, destArray, length ) {
+		if( !destArray ) destArray = array;
+		if( length === undefined ) length = array.length;
+		var elem,
+			componentCreator = es.componentCreator;
+		for(var i = 0; i < length; i++ ) {
+			elem = array[i];
+			destArray[i] = elem._isCreator ? elem : componentCreator( elem );
+		}
+		return destArray;
+	};
+
 
 // cLinks
 // 

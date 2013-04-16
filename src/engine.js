@@ -388,17 +388,6 @@ var esEngine = setProto( ESProto, function() {
 			allSelectorsHas = Object_preventExtensions( ArrayOfBitArray( INTEGERBITS ) ),
 			allSelectorsNot = Object_preventExtensions( ArrayOfBitArray( INTEGERBITS ) ),
 			nbSelectors = 0,
-			toCreators = function( array, destArray ) {
-				if( !destArray ) destArray = array;
-				var elem;
-				for(var i = 0, length = array.length; i < length; i++ ) {
-					elem = array[i];
-					if( elem._isCreator ) {
-						destArray[i] = elem;
-					}
-					destArray[i] = componentCreator( elem );
-				}
-			},
 			// Prototype for all Selectors of this es:
 			SelectorESProto = compactCreate( SelectorProto, defProps, {
 				matches: function(  ) {
@@ -418,6 +407,15 @@ var esEngine = setProto( ESProto, function() {
 						if( !allEntities.isSet( entity, pos ) ) return false;
 					} ) === false ) return false;
 					return true;
+				},
+				alwaysSelects: function( creator ) {
+					return allSelectorsHas.isSet( this._id, creator._id );
+				},
+				neverSelects: function( creator ) {
+					return allSelectorsNot.isSet( this._id, creator._id );
+				},
+				maySelects: function( creator ) {
+					return !allSelectorsNot.isSet( this._id, creator._id );
 				}
 			}),
 			// es.selector():
@@ -441,8 +439,8 @@ var esEngine = setProto( ESProto, function() {
 					has = args;
 				}
 				
-				toCreators( has );
-				toCreators( not );
+				toCreators( this, has );
+				toCreators( this, not );
 				allSelectorsHas.reset( 0 );
 				allSelectorsNot.reset( 0 );
 				for( i = 0, length = has.length; i < length; i++ ) {
@@ -509,6 +507,50 @@ var esEngine = setProto( ESProto, function() {
 				dispose: function() {
 					this.clear();
 					allBags.remove( this );
+				},
+				query: function() {
+					var bag = this,
+						args = arguments,
+						nbArgs = args.length;
+					if( nbArgs === 0) throw "Missing arguments";
+					
+					var hasSelector = isPrototypeOf( SelectorProto, args[ nbArgs - 1 ] );
+					if( hasSelector ) {
+						nbArgs--;
+					}
+					
+					var iterated = Object_freeze( toCreators( es, args, [], nbArgs ) ),
+						selector = hasSelector ? args[ nbArgs ] : Selector.apply( es, iterated ),
+						queriedArgs = [ 0 ];
+					
+					for( var i = 0; i < nbArgs; i++ ) {
+						if( selector.neverSelects( iterated[i] ) ) throw "Components of that kind will never be selected: " + iterated[i];
+						queriedArgs[i + 1] = null;
+					}
+					
+					var query = compactCreate( QueryProto, defPropsUnwriteable, {
+							bag: bag,
+							selector: selector,
+							iterated: iterated,
+							each: bag._createQueryEach( selector, iterated, iterated.length, queriedArgs )
+						});
+					
+					return query;
+				}
+			}, defPropsUnenumerable, {
+				_createQueryEach: function( selector, iterated, nbIterated, queriedArgs ) {
+					var bag = this;
+					return function( callback, thisArg ) {
+						bag.eachSelector( selector, function( entity ) {
+							queriedArgs[0] = entity;
+							for( var i = 0; i < nbIterated; i++ ) {
+								queriedArgs[i + 1] = allComponents[ iterated[i]._id ][ entity ] || null;
+							}
+							callback.apply( thisArg, queriedArgs );
+						});
+						// We don't really need to reset this:
+						// for( var i = 0; i < nbIterated; i++ ) components[i] = null;
+					};
 				}
 			}, defPropsUnenumerableUnwriteable, {
 				_es: es
@@ -569,7 +611,35 @@ var esEngine = setProto( ESProto, function() {
 					var nbEntities = allEntities.length;
 					for( var i = 1; i < nbEntities; i++ ) {
 						if( allEntities_bitsSet[ i ] !== -1  ) {
+							callback.call( thisArg, i, this );
+						}
+					}
+				},
+				eachSelector: function( selector, callback, thisArg ) {
+					var nbEntities = allEntities.length;
+					for( var i = 1; i < nbEntities; i++ ) {
+						if( allEntities_bitsSet[ i ] !== -1  ) {
+							if( selector.matchesOne( i ) ) {
+								callback.call( thisArg, i, this );
+							}
+						}
+					}
+				},
+				eachUntil: function( callback, thisArg ) {
+					var nbEntities = allEntities.length;
+					for( var i = 1; i < nbEntities; i++ ) {
+						if( allEntities_bitsSet[ i ] !== -1  ) {
 							if( callback.call( thisArg, i, this ) === false ) return false;
+						}
+					}
+				},
+				eachSelectorUntil: function( selector, callback, thisArg ) {
+					var nbEntities = allEntities.length;
+					for( var i = 1; i < nbEntities; i++ ) {
+						if( allEntities_bitsSet[ i ] !== -1  ) {
+							if( selector.matchesOne( i ) ) {
+								if( callback.call( thisArg, i, this ) === false ) return false;
+							}
 						}
 					}
 				},
@@ -595,7 +665,6 @@ var esEngine = setProto( ESProto, function() {
 		entities.discard =
 		entities.clear =
 		entities.dispose = unsupportedOperationFunc;
-		
 		
 		
 		// #### Return the es, with all needed properties exposed:

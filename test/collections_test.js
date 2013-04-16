@@ -135,6 +135,8 @@ exports.APITest = function(test) {
 	var anySelector = es.anySelector,
 		selProduct = es.selector( cDefProduct ),
 		selRareProduct = es.selector( cDefProduct, cDefRare ),
+		selUsedProduct = es.selector( Product, Used ),
+		selRareUsedProduct = es.selector( Product, Rare, Used ),
 		selRareProductNotUsed = es.selector( { has: [ cDefProduct, cDefRare ], not: [ cDefUsed ] } );
 	
     test.ok(anySelector instanceof es.selector, "Can use 'instanceof' with objects created by es.selector()");
@@ -294,6 +296,56 @@ exports.APITest = function(test) {
 	products.removeFrom(bag1, selProduct);
 	test.strictEqual(products.length, 0, "products is empty");
 	test.ok(!products.hasFrom(bag1, selRareProductNotUsed), "products has not the entities");
+	
+	
+	var query1;
+	
+	test.throws(function() {
+		query1 = entities.query();
+	}, /Missing/, "Query needs arguments");
+	
+	// entities.query():
+	query1 = entities.query(Product, Rare, Used);
+	test.strictEqual(query1.bag, entities, "Bag of query is entities");
+	test.strictEqual(query1.selector, selRareUsedProduct, "Selector of query is selRareUsedProduct");
+	test.deepEqual(query1.iterated, [Product, Rare, Used], "Iterated of query is correct");
+	
+	// entities.query() with selector:
+	query1 = entities.query(Product, Rare, Used, selUsedProduct);
+	test.strictEqual(query1.bag, entities, "Bag of query is entities");
+	test.strictEqual(query1.selector, selUsedProduct, "Selector of query is selUsedProduct");
+	test.deepEqual(query1.iterated, [Product, Rare, Used], "Iterated of query is correct");
+	
+	// Query.each():
+	var nbIncorrectEntity = 0,
+		nbErrors = 0,
+		nbProducts = 0,
+		nbRare = 0,
+		nbUsed = 0,
+		iteratedEntities = [];
+	query1.each(function(entity, product, rare, used) {
+		if(!entity || isNaN(entity) || entity <= 0 || iteratedEntities[entity]) {
+			nbIncorrectEntity++;
+		}
+		if(product) {
+			if(!(product instanceof Product)) nbErrors++;
+			nbProducts++;
+		}
+		if(rare) {
+			if(!(rare instanceof Rare)) nbErrors++;
+			nbRare++;
+		}
+		if(used) {
+			if(!(used instanceof Used)) nbErrors++;
+			nbUsed++;
+		}
+		iteratedEntities[entity] = true;
+	});
+	test.strictEqual(nbIncorrectEntity, 0, "No incorrect entity");
+	test.strictEqual(nbErrors, 0, "No error happened");
+	test.strictEqual(nbProducts, 30*2, "Iterated all products");
+	test.strictEqual(nbRare, 30*1, "Iterated all rares");
+	test.strictEqual(nbUsed, 30*2, "Iterated all used");
 	
 	
 	
