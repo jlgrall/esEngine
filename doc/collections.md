@@ -85,10 +85,10 @@ Discard all entities that match the selector.
 ### .clear()
 Removes all entities from this bag.
 
-### .query( componentType... )
+### .query( componentType..., [selector] )
 Creates a new Query. See: Query.
 
-### .liveQuery( componentType... )
+### .liveQuery( componentType..., [selector] )
 Creates a new LiveQuery. See: LiveQuery.
 
 ### .dispose()
@@ -100,10 +100,10 @@ Calls .empty(), then removes all created views, liveViews and finally itself fro
 Allows you to efficiently iterate components of a bag that matches a selector. It runs through all the entities of the bag and only returns the selected components.  
 Use this when the set of components changes rapidly and often over time.
 
-### bag.query( [selector], componentType... )
+### bag.query( componentType..., [selector] )
 **Constructor**: returns a new Query for that bag.
+- **componentType...**: ComponentCreators or component names that define which component will be returned by the iteration. Order is important and will define the order in which you receive the components in `.each()`.
 - **selector**: used to select matching entities. If missing, a selector will be made with the given componentType.
-- **componentType...**: ComponentCreators and component names that define which component will be returned by the iteration. Order is important and will define the order in which you receive the components in `.each()`.
 
 ### .bag
 The bag of this query.
@@ -138,4 +138,4 @@ Note: care must be taken when you add/remove components or entities while iterat
 
 Thus, you should wait until the end of the iteration to add new entities or components that may result in the entity being included in the currently running iteration.
 
-**It has exactly the same properties and methods as a Query. See: Query.**
+**It has exactly the same properties and methods as a Query, except `.liveQuery()` which replaces `.query()`. See: Query.**
