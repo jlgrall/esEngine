@@ -14,6 +14,7 @@ var RecycledIndexedListProto = {
 				// Get the new id:
 				id = this._indexRecycler.acquire();
 			obj._id = id;
+			Object_defineProperty( obj, "_id", defPropsUnwritable );
 			
 			// Add the object to the map and to the array:
 			map[ id ] = obj;
@@ -23,7 +24,8 @@ var RecycledIndexedListProto = {
 			var array = this.array,
 				length = array.length,
 				// The object id is not reset on the object.
-				id = obj._id;
+				id = obj._id,
+				last;
 			
 			// Remove the object from the map and the array:
 			this.map[ id ] = undefined;
@@ -32,16 +34,19 @@ var RecycledIndexedListProto = {
 				if( array[i] === obj ) {
 					// Because the array is unordered, we can the removed object with
 					// the last object. It's faster than array.split( i, 1 ):
-					array[i] = array.pop();
+					last = array.pop();
+					if( i !== length - 1 ) array[i] = last;
 					return;
 				}
 			}
+			Object_defineProperty( obj, "_id", defPropsWritable );
 		}
 	},
 	RecycledIndexedList = function( indexRecyclerOptions ) {
 		var 
-			// Map is a dense array too, because the use of a SimpleIndexRecycler makes sure that
-			// all indexes are used efficiently (ie. holes are reused).
+			// Map is a dense array too, because the use of a SimpleIndexRecycler 
+			// makes sure that all indexes are used efficiently (ie. holes are reused).
+			// Map can have some elements set to undefined though.
 			map = [],
 			indexRecycler = SimpleIndexRecycler( map, indexRecyclerOptions ),
 			list = compactCreate( RecycledIndexedListProto, defProps, {

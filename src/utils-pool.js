@@ -1,7 +1,7 @@
 var poolFactory = function( constr, init, onAcquired, onReleased, reset, capacity ) {
 
 		if( !reset ) reset = idFunc;
-		if( !capacity ) capacity = 20;
+		if( !capacity ) capacity = 32;
 		
 		var stack = [],
 			count = 0,
@@ -70,7 +70,7 @@ var poolFactory = function( constr, init, onAcquired, onReleased, reset, capacit
 			onAcquired = options.onAcquired || noopFunc,
 			onReleased = options.onReleased || noopFunc,
 			reset = options.reset || noopFunc,
-			capacity = options.capacity || 32,
+			capacity = options.capacity,
 			def = poolFactory( constr, init, onAcquired,  onReleased, reset, capacity ),
 			acquireName = options.acquireName || "acquire",
 			releaseName = options.releaseName || "release",

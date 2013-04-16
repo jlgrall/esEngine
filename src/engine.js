@@ -306,7 +306,7 @@ var esEngine = setProto( ESProto, function() {
 						// Each creator has its pool, which automatically manages component creation and reuse.
 						// Here we create the pool on top of the component constructor, and we get references to
 						// the pool's functions.
-						poolDef = poolFactory( constr, cDef.init, onAcquired, onReleased, cDef._reset ),
+						poolDef = poolFactory( constr, cDef.init, onAcquired, onReleased, cDef._reset, 20 ),
 						poolDef_disposer = poolDef.disposer,
 						
 						// Component prototype, inheriting from cDef.helpers and adding functions specific to the creator.
@@ -360,6 +360,7 @@ var esEngine = setProto( ESProto, function() {
 					
 					// Store the new creator and implicitly give it an id:
 					allCreators.add( name, creator );
+					Object_defineProperty( creator, "_id", defPropsUnenumerable );
 					
 					var creatorId = creator._id,
 						components = allComponents[ creatorId ] = {};
@@ -367,7 +368,6 @@ var esEngine = setProto( ESProto, function() {
 					// Add properties and methods to the creator:
 					compactDefine( creator, defPropsUnenumerableUnwritable, {
 						_es: es,
-						_id: creatorId,
 						_isCreator: true
 					}, defPropsUnwritable, {
 						def: cDef,
