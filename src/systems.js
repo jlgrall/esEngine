@@ -35,7 +35,7 @@ var
 		}
 	
 		// Create the systemDef:
-		var sDef = compactCreate( SystemDefProto, defPropsUnwriteable, {
+		var sDef = compactCreate( SystemDefProto, defPropsUnwritable, {
 				name: name
 			}, defPropsFreeze, {
 				cDefs: cDefs,

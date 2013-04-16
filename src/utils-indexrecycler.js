@@ -89,7 +89,7 @@ var
 					},
 					set: unsupportedOperationFunc
 				}
-			}, defPropsUnwriteable, {
+			}, defPropsUnwritable, {
 				acquire: function() {
 					var index = nextIndex();
 					nbUsed++;
@@ -116,7 +116,7 @@ var
 						}
 					}
 				}
-			}, defPropsUnenumerableUnwriteable, {
+			}, defPropsUnenumerableUnwritable, {
 				nextAvailable: function( from ) {
 					while( from < length && !isAvailable( from )) from++;
 					if( from === length ) {

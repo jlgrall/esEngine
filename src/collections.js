@@ -105,7 +105,7 @@ var
 			// This is ok, because es.entities has no .clear():
 			this._length = 0;
 		}
-	}, defPropsUnenumerableUnwriteable, {
+	}, defPropsUnenumerableUnwritable, {
 		_doForEntitiesFrom: function( action, args, continueResult, endResult ) {
 			var nbArgs = args.length,
 				hasSelector = isPrototypeOf( SelectorProto, args[ nbArgs - 1 ] ),

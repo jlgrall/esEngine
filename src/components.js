@@ -20,7 +20,7 @@ var
 			analyse = analyseAttr( name, attr ),
 		
 			// Create the componentDef:
-			cDef = compactCreate( ComponentDefProto, defPropsUnwriteable, {
+			cDef = compactCreate( ComponentDefProto, defPropsUnwritable, {
 				name: name,
 				init: objectDef.init || noopFunc,
 				_set: objectDef.set || makeComponentDefSet( attr, analyse ),
@@ -223,9 +223,9 @@ var
 				throw "This is not an eLink";
 			};
 		
-		compactDefine( cLinkProto, defPropsUnwriteable, {
+		compactDefine( cLinkProto, defPropsUnwritable, {
 			dispose: poolDef.disposer
-		}, defPropsUnenumerableUnwriteable, {
+		}, defPropsUnenumerableUnwritable, {
 			_pool: poolDef.pool
 		}, defDescriptors, {
 			// Just in case someone mistakes this for an eLink:

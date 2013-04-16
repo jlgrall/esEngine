@@ -38,7 +38,7 @@ var
 // Each bitArray keeps an internal counter of bitsSet, that is, how many bits are true.
 var 
 	// Prototype of ArrayOfBitArray:
-	ArrayOfBitArrayProto = compactDefine( {}, defPropsUnwriteable, {
+	ArrayOfBitArrayProto = compactDefine( {}, defPropsUnwritable, {
 		// Set a bit at pos to true.
 		// Don't execute if the bit is already true, or the bitsSet will be shifted !
 		set: function( bitArray, pos ) {
@@ -197,7 +197,7 @@ var
 		var obj = compactCreate( ArrayOfBitArrayProto, defPropsUnenumerable, {
 			_length: 0,
 			_size: 0,
-		}, defPropsUnenumerableUnwriteable, {
+		}, defPropsUnenumerableUnwritable, {
 			_arr: [],
 			_bitsSet: []
 		}, defProps, {

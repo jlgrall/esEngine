@@ -47,7 +47,7 @@ var RecycledIndexedListProto = {
 			list = compactCreate( RecycledIndexedListProto, defProps, {
 				array: [],
 				map: map
-			}, defPropsUnenumerableUnwriteable, {
+			}, defPropsUnenumerableUnwritable, {
 				_indexRecycler: indexRecycler
 			});
 		
@@ -75,7 +75,7 @@ var RecycledIndexedNamedListProto = {
 				array: list.array,
 				map: list.map,
 				names: {}
-			}, defPropsUnenumerableUnwriteable, {
+			}, defPropsUnenumerableUnwritable, {
 				_list: list
 			});
 		

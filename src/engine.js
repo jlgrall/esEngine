@@ -205,9 +205,9 @@ var esEngine = setProto( ESProto, function() {
 						throw "This is not a cLink";
 					};
 				
-				compactDefine( eLinkESProto, defPropsUnwriteable, {
+				compactDefine( eLinkESProto, defPropsUnwritable, {
 					dispose: poolDef.disposer
-				}, defPropsUnenumerableUnwriteable, {
+				}, defPropsUnenumerableUnwritable, {
 					_pool: poolDef.pool
 				}, defDescriptors, {
 					// Just in case someone mistakes this for a cLink:
@@ -309,7 +309,7 @@ var esEngine = setProto( ESProto, function() {
 						poolDef_disposer = poolDef.disposer,
 						
 						// Component prototype, inheriting from cDef.helpers and adding functions specific to the creator.
-						proto = compactCreate( cDef.helpers , defPropsUnenumerableUnwriteable, {
+						proto = compactCreate( cDef.helpers , defPropsUnenumerableUnwritable, {
 							$creator: creator = poolDef.acquirer,
 							$addTo: function( entity ) {
 								if( !(entity > 0) ) throw "Cannot add to no entity: " + name;
@@ -364,11 +364,11 @@ var esEngine = setProto( ESProto, function() {
 						components = allComponents[ creatorId ] = {};
 					
 					// Add properties and methods to the creator:
-					compactDefine( creator, defPropsUnenumerableUnwriteable, {
+					compactDefine( creator, defPropsUnenumerableUnwritable, {
 						_es: es,
 						_id: creatorId,
 						_isCreator: true
-					}, defPropsUnwriteable, {
+					}, defPropsUnwritable, {
 						def: cDef,
 						getFor: function( entity ) {
 							return components[ entity ] || null;
@@ -465,7 +465,7 @@ var esEngine = setProto( ESProto, function() {
 					allSelectorsNot.length += 1;
 					allSelectorsNot.copy( 0, idFound );
 					
-					selector = allSelectors[ idFound ] = compactCreate( SelectorESProto, defPropsUnenumerableUnwriteable, {
+					selector = allSelectors[ idFound ] = compactCreate( SelectorESProto, defPropsUnenumerableUnwritable, {
 						_es: es,
 						_id: idFound
 					});
@@ -482,7 +482,7 @@ var esEngine = setProto( ESProto, function() {
 		allSelectorsHas.length = 2;
 		allSelectorsNot.length = 2;
 		
-		var anySelector = allSelectors[ 1 ] = compactCreate( SelectorESProto, defPropsUnenumerableUnwriteable, {
+		var anySelector = allSelectors[ 1 ] = compactCreate( SelectorESProto, defPropsUnenumerableUnwritable, {
 				_es: es,
 				_id: 1
 			});
@@ -528,7 +528,7 @@ var esEngine = setProto( ESProto, function() {
 						queriedArgs[i + 1] = null;
 					}
 					
-					var query = compactCreate( QueryProto, defPropsUnwriteable, {
+					var query = compactCreate( QueryProto, defPropsUnwritable, {
 							bag: bag,
 							selector: selector,
 							iterated: iterated,
@@ -552,7 +552,7 @@ var esEngine = setProto( ESProto, function() {
 						// for( var i = 0; i < nbIterated; i++ ) components[i] = null;
 					};
 				}
-			}, defPropsUnenumerableUnwriteable, {
+			}, defPropsUnenumerableUnwritable, {
 				_es: es
 			}, defDescriptors, {
 				length: {
@@ -571,7 +571,7 @@ var esEngine = setProto( ESProto, function() {
 				}, defPropsUnenumerable, {
 					_id: -1,	// Will be set in allBags.add()
 					_length: 0
-				}, defPropsUnenumerableUnwriteable, {
+				}, defPropsUnenumerableUnwritable, {
 					// Map of contained entities:
 					_e: {}
 				});
@@ -644,7 +644,7 @@ var esEngine = setProto( ESProto, function() {
 					}
 				},
 				clearEntities: function() {}
-			}, defPropsUnwriteable, {
+			}, defPropsUnwritable, {
 				name: "*"
 			}, defDescriptors, {
 				length: {
@@ -668,7 +668,7 @@ var esEngine = setProto( ESProto, function() {
 		
 		
 		// #### Return the es, with all needed properties exposed:
-		return compactDefine( es, defPropsUnwriteable, {
+		return compactDefine( es, defPropsUnwritable, {
 				entities: entities,
 				newEntity: newEntity,
 				eLink: eLink,
