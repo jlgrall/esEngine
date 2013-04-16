@@ -50,7 +50,7 @@ npm install -g grunt-cli
 Clone the git repository locally and go in it:
 
 ```sh
-git clone git://github.com/jquery/jquery.git
+git clone git://github.com/jlgrall/esEngine.git
 cd esEngine
 ```
 
