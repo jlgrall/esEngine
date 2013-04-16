@@ -109,6 +109,10 @@ var
 			}
 			for( i = 0; i < nbArgs; i++ ) {
 				arg = args[i];
+				if( isPrototypeOf( eLinkProto, arg ) ) {
+					arg = arg.e;
+					if( arg === 0 ) continue;
+				}
 				if( arg > 0 ) {
 					entity = arg;
 					if( !selector || selector.matches( entity ) ) {
@@ -120,6 +124,10 @@ var
 					length2 = arg.length;
 					for( j = 0; j < length2; j++ ) {
 						entity = arg[j];
+						if( isPrototypeOf( eLinkProto, entity ) ) {
+							entity = entity.e;
+							if( entity === 0 ) continue;
+						}
 						if( !selector || selector.matches( entity ) ) {
 							result = action.call( this, entity );
 							if( result !== continueResult ) return result;

@@ -9,6 +9,7 @@ var
 // This function will be exported to the global object.
 // Structure of the function:
 // - entities
+// - eLinks
 // - ComponentCreators
 // - Selectors
 // - Bags
@@ -101,6 +102,21 @@ var esEngine = function() {
 				for( var j = 0; j < bagsLength; j++ ) {
 					allBagsArray[j].removeOne( entity );
 				}
+				
+				var links = eLinkActive[ entity ];
+				// Break all eLinks to this entity:
+				if( links ) {
+					var nbLinks = links.length;
+					if( nbLinks > 0 ) {
+						for( var i = 0; i < nbLinks; i++ ) {
+							links[i]._e = 0;
+						}
+						links.length = 0;
+					}
+					eLinkArraysPool.release( links );
+					delete eLinkActive[ entity ];
+				}
+				
 				// The entity can be reused now:
 				entitiesManager.release( entity );
 			},
@@ -112,6 +128,100 @@ var esEngine = function() {
 			// Acquire and discard the entity with id 0,
 			// because entity ids must start at 1
 			if( entitiesManager.acquire() !== 0 ) throw "First entity must be 0";
+		
+		
+		
+		// ### eLinks
+		var 
+			// Contains eLinks that are referencing an entity:
+			eLinkActive = {},
+			// A pool for eLinks:
+			eLinkArraysPool = pool({
+				constr: function() {
+					return [];
+				},
+				reset: function( array ) {
+					array.length = 0;
+				},
+				capacity: 256
+			}),
+			// Prototype for all eLinks of this es:
+			eLinkESProto = compactCreate(eLinkProto, defDescriptors, {
+				e: {
+					enumerable: true,	// TODO; why doesn't it work ? "e" is not enumerable !
+					get: function() {
+						return this._e;
+					},
+					set: function( entity ) {
+						var links;
+						if( this._e !== 0 ) {
+							links = eLinkActive[this._e];
+							var _index = this._index,
+								last = links.pop();
+							if( _index !== links.length ) {
+								links[ _index ] = last;
+							}
+						}
+						this._e = entity;
+						if( entity !== 0 ) {
+							if( !entities.has( entity ) ) throw "The entity does not exist";
+							links = eLinkActive[ entity ];
+							if( !links ) links = eLinkActive[ entity ] = eLinkArraysPool.acquire();
+							this._index = links.push( this ) - 1;
+						}
+					}
+				}
+			}),
+			// es.eLink( entity ).
+			// Setup the eLink pool on top of the eLinkESProto.
+			eLink = (function() {
+				var instanceProperties = {
+						_e: {
+							writable: true,
+							enumerable: false,
+							value: 0
+						},
+						_index: {
+							writable: true,
+							enumerable: false,
+							value: -1
+						}
+					},
+					constr = function() {
+						var eLink = Object_create( eLinkESProto );
+						Object_defineProperties( eLink, instanceProperties );
+						// Now we lock the eLink:
+						Object_preventExtensions( eLink );
+						return eLink;
+					},
+					init = function( entity ) {
+						if( entity !== undefined ) this.e = entity;
+					},
+					reset = function( eLink ) {
+						eLink.e = 0;
+					},
+					poolDef = poolFactory( constr, init, noopFunc, noopFunc, reset, 512 ),
+					notACLinkFunc = function() {
+						throw "This is not a cLink";
+					};
+				
+				compactDefine( eLinkESProto, defPropsUnwriteable, {
+					dispose: poolDef.disposer
+				}, defPropsUnenumerableUnwriteable, {
+					_pool: poolDef.pool
+				}, defDescriptors, {
+					// Just in case someone mistakes this for a cLink:
+					c: {
+						enumerable: false,
+						get: notACLinkFunc,
+						set: notACLinkFunc,
+					}
+				});
+				// Lock the eLinkESProto:
+				Object_freeze( eLinkESProto );
+				
+				return poolDef.acquirer;
+			})();
 		
 		
 		
@@ -167,6 +277,12 @@ var esEngine = function() {
 								writable: true,
 								enumerable: false,
 								value: 0
+							},
+							// cLinks referencing this component:
+							$links: {
+								writable: true,
+								enumerable: false,
+								value: null
 							}
 						},
 						// Component constructor (used directly in the poolFactory)
@@ -204,10 +320,23 @@ var esEngine = function() {
 								components[ entity ] = this;
 							},
 							$remove: function() {
-								var entity = this.$e;
+								var entity = this.$e,
+									links = this.$links;
 								if( entity === 0 ) throw "This component was not added to an entity: " + name;
 								delete components[ entity ];
 								this.$e = 0;
+								
+								// Break all cLinks to this component:
+								if( links !== null ) {
+									var nbLinks = links.length;
+									if( nbLinks > 0 ) {
+										for( var i = 0; i < nbLinks; i++ ) {
+											links[i]._c = null;
+										}
+										links.length = 0;
+									}
+								}
+								
 								// If this is the last component of the entity, dispose the entity:
 								if( allEntities.unset( entity, creatorId ) === 0 ) {
 									disposeOneEmptyEntity( entity );
@@ -216,6 +345,12 @@ var esEngine = function() {
 							$dispose: function() {
 								// Check if we need to be removed:
 								if( this.$e !== 0 ) this.$remove();
+								
+								if( this.$links !== null ) {
+									cLinkArraysPool.release( this.$links );
+									this.$links = null;
+								}
+								
 								poolDef_disposer.call( this );
 							}
 						});
@@ -465,8 +600,10 @@ var esEngine = function() {
 		return compactDefine( es, defPropsUnwriteable, {
 				entities: entities,
 				newEntity: newEntity,
+				eLink: eLink,
 				disposeEntity: disposeEntity,
 				componentCreator: componentCreator,
+				cLink: cLink,
 				selector: selector,
 				anySelector: anySelector,
 				bag: bag

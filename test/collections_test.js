@@ -170,8 +170,8 @@ exports.APITest = function(test) {
 	test.ok(!bag1.has(5), "bag1 has no entity 5");
 	test.ok(entities.has(5), "Entity 5 was not destroyed");
 	
-	testEntities = [1, 32, 52, 126];
-	var nbTestEntities = testEntities.length;
+	testEntities = [1, es.eLink(32), 52, es.eLink(), 126];
+	var nbTestEntities = testEntities.length - 1;
 	
 	// bag.addFrom() with entities
 	test.ok(!bag1.has(1), "bag1 has not entity 1");

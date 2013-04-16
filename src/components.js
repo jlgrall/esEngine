@@ -134,3 +134,94 @@ var
 			unsupportedOperationFunc();
 		}
 	});
+
+
+// cLinks
+// 
+var 
+	// A pool for arrays used for cLinks:
+	cLinkArraysPool = pool({
+		constr: function() {
+			return [];
+		},
+		reset: function( array ) {
+			array.length = 0;
+		},
+		capacity: 512
+	}),
+	
+	// Prototype for all cLinks:
+	cLinkProto = Object_create({
+		get c() {
+			return this._c;
+		},
+		set c( component ) {
+			var links;
+			if( this._c !== null ) {
+				links = this._c.$links;
+				var _index = this._index,
+					last = links.pop();
+				if( _index !== links.length ) {
+					links[ _index ] = last;
+				}
+			}
+			this._c = component;
+			if( component !== null ) {
+				if( component.$e === 0 ) throw "The component to link to was not added to an entity";
+				links = component.$links;
+				if( links === null ) links = component.$links = cLinkArraysPool.acquire();
+				this._index = links.push( this ) - 1;
+			}
+		}
+	}),
+	
+	// es.cLink( component ).
+	// Setup the cLink pool on top of the cLinkProto.
+	cLink = (function() {
+		var instanceProperties = {
+				_c: {
+					writable: true,
+					enumerable: false,
+					value: null
+				},
+				_index: {
+					writable: true,
+					enumerable: false,
+					value: -1
+				}
+			},
+			constr = function() {
+				var cLink = Object_create( cLinkProto );
+				Object_defineProperties( cLink, instanceProperties );
+				// Now we lock the cLink:
+				Object_preventExtensions( cLink );
+				return cLink;
+			},
+			init = function( component ) {
+				if( component !== undefined && component !== null ) this.c = component;
+			},
+			reset = function( cLink ) {
+				cLink.c = null;
+			},
+			poolDef = poolFactory( constr, init, noopFunc, noopFunc, reset, 512 ),
+			notAnELinkFunc = function() {
+				throw "This is not an eLink";
+			};
+		
+		compactDefine( cLinkProto, defPropsUnwriteable, {
+			dispose: poolDef.disposer
+		}, defPropsUnenumerableUnwriteable, {
+			_pool: poolDef.pool
+		}, defDescriptors, {
+			// Just in case someone mistakes this for an eLink:
+			e: {
+				enumerable: false,
+				get: notAnELinkFunc,
+				set: notAnELinkFunc,
+			}
+		});
+		// Lock the cLinkProto:
+		Object_freeze( cLinkProto );
+		
+		return poolDef.acquirer;
+	})();

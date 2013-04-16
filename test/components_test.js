@@ -165,6 +165,7 @@ exports.APITest = function(test) {
 	comp1b = cCreator0.getFor(entity1);
 	test.strictEqual(comp1b, null, "component.getFor() returns null when there is no component");
 	
+	
 	// Component (removing from entities)
 	// Always keep at least one component in the entity so it is not diposed.
 	
@@ -187,6 +188,35 @@ exports.APITest = function(test) {
 	test.strictEqual(comp1.$entity, 0, "The component was removed from the entity");
 	test.strictEqual(cCreator1.getFor(entity1), null, "The component was removed from the entity");
 	comp1 = null;
+	
+	
+	// cLinks
+	
+	comp1 = cCreator1();
+	comp1.$addTo(entity1);
+	var cLink0 = es.cLink(),
+		cLink1 = es.cLink(comp1);
+	
+	test.strictEqual(cLink0.c, null, "cLink0 doesn't link to a component");
+	test.strictEqual(cLink1.c, comp1, "cLink1 links to comp1");
+	
+	cLink0.c = comp0;
+	test.strictEqual(cLink0.c, comp0, "cLink0 links to comp0");
+	cLink1.c = null;
+	test.strictEqual(cLink1.c, null, "cLink1 doesn't link to a component");
+	
+	comp0.$remove();
+	test.strictEqual(cLink0.c, null, "cLink0 doesn't link to a component");
+	
+	test.throws(function() {
+		cLink0.c = comp0;
+	}, /not added/, "Cannot link to a component that was not added to an entity");
+	comp0.$addTo(entity1);
+	
+	cLink1.c = comp1;
+	cLink1.dispose();
+	// Testing .dispose() (Though when an object is disposed we shouldn't access it.)
+	test.strictEqual(cLink1.c, null, "cLink1 doesn't link to a component");
 	
 	test.done();
 };
