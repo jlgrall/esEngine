@@ -1,5 +1,15 @@
 
-var BagProto = compactDefine({
+var 
+	// Prototype for all Selectors:
+	SelectorProto = Object_freeze( {
+		equals: function( oSelector ) {
+			return this._es === oSelector._es && this._id === oSelector._id;
+		}
+	});
+
+var 
+	// Prototype for all Bags:
+	BagProto = compactDefine({
 		add: function() {
 			var args = arguments,
 				nbArgs = args.length,
@@ -58,6 +68,12 @@ var BagProto = compactDefine({
 		discard: function( selector ) {
 			
 		},
+		each: function( callback, thisArg ) {
+			var entities = this._e;
+			for( var entity in entities ) {
+				if( callback.call( thisArg, entity, this ) === false ) return false;
+			}
+		},
 		clear: function() {
 			var entities = this._e,
 				i;
@@ -67,37 +83,53 @@ var BagProto = compactDefine({
 			// This is ok, because es.entities has no .clear():
 			this._length = 0;
 		}
-	}, defPropsUnwriteable, {
+	}, defPropsUnenumerableUnwriteable, {
 		_doForEntitiesFrom: function( action, args, continueResult, endResult ) {
-			var selector = null,
-				length = args.length - (selector ? 1 : 0),
+			var nbArgs = args.length,
+				hasSelector = isPrototypeOf( SelectorProto, args[ nbArgs - 1 ] ),
+				selector = null,
 				entities = this._e,
-				oEntities,
 				length2,
 				arg,
+				entity,
 				i, j,
-				result;
-			for( i = 1; i < length; i++ ) {
+				result,
+				eachCallback = hasSelector ? function( entity ) {
+					if( selector.matches( entity ) ) {
+						result = action.call( this, entity );
+						if( result !== continueResult ) return false;
+					}
+				} : function( entity ) {
+					result = action.call( this, entity );
+					if( result !== continueResult ) return false;
+				};
+			if( hasSelector ) {
+				nbArgs--;
+				selector = args[ nbArgs ];
+			}
+			for( i = 0; i < nbArgs; i++ ) {
 				arg = args[i];
 				if( arg > 0 ) {
-					result = action.call( this, arg );
-					if( result !== continueResult ) return result;
+					entity = arg;
+					if( !selector || selector.matches( entity ) ) {
+						result = action.call( this, entity );
+						if( result !== continueResult ) return result;
+					}
 				}
 				else if( isArray( arg ) ) {
 					length2 = arg.length;
 					for( j = 0; j < length2; j++ ) {
-						result = action.call( this, arg[j] );
-						if( result !== continueResult ) return result;
+						entity = arg[j];
+						if( !selector || selector.matches( entity ) ) {
+							result = action.call( this, entity );
+							if( result !== continueResult ) return result;
+						}
 					}
 				}
 				else if( isPrototypeOf( BagProto, arg ) ) {
-					oEntities = arg._e;
-					for( j in oEntities ) {
-						result = action.call( this, j );
-						if( result !== continueResult ) return result;
-					}
+					if( arg.each( eachCallback, this ) === false ) return result;
 				}
-				else throw "This is not an entity container: " + arg;
+				else throw "This is not a collection of entities: " + arg;
 			}
 			return endResult;
 		}

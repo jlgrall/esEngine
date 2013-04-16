@@ -10,6 +10,7 @@ var
 // Structure of the function:
 // - entities
 // - ComponentCreators
+// - Selectors
 // - Bags
 // - es.entities
 var esEngine = function() {
@@ -123,7 +124,10 @@ var esEngine = function() {
 			allCreators = RecycledIndexedNamedList({
 				onArrayExpanded: function( length ) {
 					if( length > allEntities.size ) {
-						allEntities.size = Math.ceil( length / INTEGERBITS ) * INTEGERBITS;
+						var size = Math.ceil( length / INTEGERBITS ) * INTEGERBITS;
+						allEntities.size = size;
+						allSelectorsHas.size = size;
+						allSelectorsNot.size = size;
 					}
 				},
 				onArrayReduced: function( length ) {
@@ -225,7 +229,8 @@ var esEngine = function() {
 					// Add properties and methods to the creator:
 					compactDefine( creator, defPropsUnenumerableUnwriteable, {
 						_es: es,
-						_id: creatorId
+						_id: creatorId,
+						_isCreator: true
 					}, defPropsUnwriteable, {
 						def: cDef,
 						getFor: function( entity ) {
@@ -237,6 +242,116 @@ var esEngine = function() {
 				
 				return creator;
 			};
+		
+		
+		
+		// ### Selectors
+		var allSelectors = [],
+			// Selector ids start at 1 (not 0).
+			allSelectorsHas = Object_preventExtensions( ArrayOfBitArray( INTEGERBITS ) ),
+			allSelectorsNot = Object_preventExtensions( ArrayOfBitArray( INTEGERBITS ) ),
+			nbSelectors = 0,
+			toCreators = function( array, destArray ) {
+				if( !destArray ) destArray = array;
+				var elem;
+				for(var i = 0, length = array.length; i < length; i++ ) {
+					elem = array[i];
+					if( elem._isCreator ) {
+						destArray[i] = elem;
+					}
+					destArray[i] = componentCreator( elem );
+				}
+			},
+			// Prototype for all Selectors of this es:
+			SelectorESProto = compactCreate( SelectorProto, defProps, {
+				matches: function(  ) {
+					var args = arguments,
+						nbArgs = args.length;
+					for( var i = 0; i < nbArgs; i++ ) {
+						if( !this.matchesOne( args[i] ) ) return false;
+					}
+					return true;
+				},
+				matchesOne: function( entity ) {
+					var id  = this._id;
+					if( allSelectorsNot.eachSet( id, function( pos ) {
+						if( allEntities.isSet( entity, pos ) ) return false;
+					} ) === false ) return false;
+					if( allSelectorsHas.eachSet( id, function( pos ) {
+						if( !allEntities.isSet( entity, pos ) ) return false;
+					} ) === false ) return false;
+					return true;
+				}
+			}),
+			// es.selector():
+			selector = function() {
+				var args = arguments,
+					args0 = args[0],
+					has = emptyArray,
+					not = emptyArray,
+					length,
+					i;
+				if( args.length === 0 ) throw "Missing arguments";
+				
+				if( args0.has || args0.not ) {
+					if( args0.has && !isArray( args0.has ) || args0.not && !isArray( args0.not ) ) {
+						throw "Wrong arguments";
+					}
+					if( args0.has ) has = args0.has;
+					if( args0.not ) not = args0.not;
+				}
+				else {
+					has = args;
+				}
+				
+				toCreators( has );
+				toCreators( not );
+				allSelectorsHas.reset( 0 );
+				allSelectorsNot.reset( 0 );
+				for( i = 0, length = has.length; i < length; i++ ) {
+					allSelectorsHas.set( 0, has[i]._id );
+				}
+				for( i = 0, length = not.length; i < length; i++ ) {
+					allSelectorsNot.set( 0, not[i]._id );
+				}
+				
+				var idFound = 0,
+					selector;
+				// Start after anySelector:
+				for( i = 1; i < nbSelectors; i++ ) {
+					if( allSelectorsHas.equals( 0, i + 1) && allSelectorsNot.equals( 0, i + 1) ) {
+						idFound = i + 1;
+					}
+				}
+				if( idFound === 0 ) {
+					idFound = nbSelectors++ + 1;
+					allSelectorsHas.length += 1;
+					allSelectorsHas.copy( 0, idFound );
+					allSelectorsNot.length += 1;
+					allSelectorsNot.copy( 0, idFound );
+					
+					selector = allSelectors[ idFound ] = compactCreate( SelectorESProto, defPropsUnenumerableUnwriteable, {
+						_es: es,
+						_id: idFound
+					});
+				}
+				else {
+					selector = allSelectors[ idFound ];
+				}
+				
+				return selector;
+			};
+			
+		// Reserve the id 0 as a working space for temporary datas,
+		// and id 1 for anySelector.
+		allSelectorsHas.length = 2;
+		allSelectorsNot.length = 2;
+		
+		var anySelector = allSelectors[ 1 ] = compactCreate( SelectorESProto, defPropsUnenumerableUnwriteable, {
+				_es: es,
+				_id: 1
+			});
+		nbSelectors++;
 		
 		
 		
@@ -313,6 +428,14 @@ var esEngine = function() {
 				},
 				keepEntities: function() {},
 				discardEntities: function() {},
+				each: function( callback, thisArg ) {
+					var nbEntities = allEntities.length;
+					for( var i = 1; i < nbEntities; i++ ) {
+						if( allEntities_bitsSet[ i ] !== -1  ) {
+							if( callback.call( thisArg, i, this ) === false ) return false;
+						}
+					}
+				},
 				clearEntities: function() {}
 			}, defPropsUnwriteable, {
 				name: "*"
@@ -344,6 +467,8 @@ var esEngine = function() {
 				newEntity: newEntity,
 				disposeEntity: disposeEntity,
 				componentCreator: componentCreator,
+				selector: selector,
+				anySelector: anySelector,
 				bag: bag
 			});
 	};

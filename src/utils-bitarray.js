@@ -62,6 +62,7 @@ var
 		},
 		// Executes callback for each bit set.
 		// Callback receives 2 arguments: position of the bit, index of the bitArray.
+		// Immediately returns false if the callback returns false.
 		eachSet: function( bitArray, callback ) {
 			var arr = this._arr,
 				nbValues = arr.length,
@@ -70,12 +71,12 @@ var
 				pos;
 			
 			for( var v = 0; v < nbValues; v++ ) {
-				val = this._arr[v][ bitArray ];
+				val = arr[v][ bitArray ];
 				while( val !== 0 ) {
 					lowestBit = val & -val;
 					val &= ~lowestBit;
 					pos = MultiplyDeBruijnBitPosition[ ( lowestBit * 0x077CB531 ) >> 27 ];
-					callback( pos, bitArray );
+					if( callback( pos, bitArray ) === false) return false;
 				}
 			}
 		},
@@ -103,6 +104,25 @@ var
 				arr[v][ bitArray ] = 0;
 			}
 			this._bitsSet[ bitArray ] = 0;
+		},
+		equals: function( bitArray1, bitArray2 ) {
+			var arr = this._arr,
+				nbValues = arr.length,
+				bitsSet = this._bitsSet;
+			if( bitsSet[ bitArray1 ] !== bitsSet[ bitArray2 ] ) return false;
+			for( var v = 0; v < nbValues; v++ ) {
+				if( arr[v][ bitArray1 ] !== arr[v][ bitArray2 ] ) return false;
+			}
+			return true;
+		},
+		copy: function( fromBitArray, toBitArray ) {
+			var arr = this._arr,
+				nbValues = arr.length,
+				bitsSet = this._bitsSet;
+			for( var v = 0; v < nbValues; v++ ) {
+				arr[v][ toBitArray ] = arr[v][ fromBitArray ];
+			}
+			bitsSet[ toBitArray ] = bitsSet[ fromBitArray ];
 		}
 	}, defDescriptors, {
 		// Length is the number of bitArrays:

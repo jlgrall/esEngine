@@ -52,6 +52,7 @@ var
 	idFunc = function( val ) {
 		return val;
 	},
+	emptyArray = Object_freeze( [] ),
 	unsupportedOperationFunc = function() {
 		throw "Unsupported operation !";
 	};
