@@ -5,10 +5,10 @@ esEngine.version = version;
 esEngine.ArrayOfBitArray = ArrayOfBitArray;
 esEngine.BufferedIndexRecycler = BufferedIndexRecycler;
 
-esEngine._cDefs = esEngine_cDefs;
+//esEngine._cDefs = esEngine_cDefs;
 esEngine.ComponentDef = ComponentDef;
 
-esEngine._sDefs = esEngine_sDefs;
+//esEngine._sDefs = esEngine_sDefs;
 esEngine.SystemDef = SystemDef;
 
 
