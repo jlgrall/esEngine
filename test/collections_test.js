@@ -298,17 +298,18 @@ exports.APITest = function(test) {
 	test.ok(!products.hasFrom(bag1, selRareProductNotUsed), "products has not the entities");
 	
 	
-	var query1;
+	var query0,
+		query1;
 	
 	test.throws(function() {
 		query1 = entities.query();
 	}, /Missing/, "Query needs arguments");
 	
 	// entities.query():
-	query1 = entities.query(Product, Rare, Used);
-	test.strictEqual(query1.bag, entities, "Bag of query is entities");
-	test.strictEqual(query1.selector, selRareUsedProduct, "Selector of query is selRareUsedProduct");
-	test.deepEqual(query1.iterated, [Product, Rare, Used], "Iterated of query is correct");
+	query0 = entities.query(Product, Rare, Used);
+	test.strictEqual(query0.bag, entities, "Bag of query is entities");
+	test.strictEqual(query0.selector, selRareUsedProduct, "Selector of query is selRareUsedProduct");
+	test.deepEqual(query0.iterated, [Product, Rare, Used], "Iterated of query is correct");
 	
 	// entities.query() with selector:
 	query1 = entities.query(Product, Rare, Used, selUsedProduct);
@@ -347,9 +348,10 @@ exports.APITest = function(test) {
 	test.strictEqual(nbRare, 30*1, "Iterated all rares");
 	test.strictEqual(nbUsed, 30*2, "Iterated all used");
 	
+	// query.dispose():
+	query1.dispose();
 	
-	
-	// bag.dispose():
+	// bag.dispose() (should also dispose query0):
 	bag1.add(5);
 	test.ok(bag1.has(5), "bag1 has entity 5");
 	bag1.dispose();

@@ -506,6 +506,10 @@ var esEngine = setProto( ESProto, function() {
 				},
 				disposeEntity: disposeEntity,
 				dispose: function() {
+					var allQueriesArray = this._allQueries.array;
+					while( allQueriesArray.length > 0 ) {
+						allQueriesArray[0].dispose();
+					}
 					this.clear();
 					allBags.remove( this );
 				},
@@ -534,7 +538,11 @@ var esEngine = setProto( ESProto, function() {
 							selector: selector,
 							iterated: iterated,
 							each: bag._createQueryEach( selector, iterated, iterated.length, queriedArgs )
-						});
+						}, defPropsUnenumerable, {
+							_id: -1	// Will be set in this._allQueries.add()
+						 });
+					
+					this._allQueries.add( query );
 					
 					return query;
 				}
@@ -574,7 +582,8 @@ var esEngine = setProto( ESProto, function() {
 					_length: 0
 				}, defPropsUnenumerableUnwritable, {
 					// Map of contained entities:
-					_e: {}
+					_e: {},
+					_allQueries: RecycledIndexedList()
 				});
 				
 				allBags.add( bag );
@@ -647,6 +656,8 @@ var esEngine = setProto( ESProto, function() {
 				clearEntities: function() {}
 			}, defPropsUnwritable, {
 				name: "*"
+			}, defPropsUnenumerableUnwritable, {
+				_allQueries: RecycledIndexedList()
 			}, defDescriptors, {
 				length: {
 					get: function() {

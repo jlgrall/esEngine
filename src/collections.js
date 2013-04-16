@@ -169,4 +169,7 @@ var
 var 
 	// Prototype for all Queries:
 	QueryProto = compactDefine({
+		dispose: function() {
+			this.bag._allQueries.remove( this );
+		}
 	});

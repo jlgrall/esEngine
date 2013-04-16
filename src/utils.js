@@ -55,6 +55,9 @@ var
 	emptyArray = Object_freeze( [] ),
 	unsupportedOperationFunc = function() {
 		throw "Unsupported operation !";
+	},
+	disposedObjectFunc = function() {
+		throw "This object was disposed: " + this;
 	};
 
 
