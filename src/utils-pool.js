@@ -63,9 +63,15 @@ var poolFactory = function( constr, init, onAcquired, onReleased, reset, capacit
 			pool: pool
 		};
 	},
-	attachPool = function(klass, options) {
-		if(klass._pool) throw "This is already a pool: " + klass;
-		var def = poolFactory(options.constr, options.init, options.reset, options.capacity),
+	attachPool = function( klass, options ) {
+		if( klass._pool ) throw "This is already a pool: " + klass;
+		var constr = options.constr,
+			init = options.init || noopFunc,
+			onAcquired = options.onAcquired || noopFunc,
+			onReleased = options.onReleased || noopFunc,
+			reset = options.reset || noopFunc,
+			capacity = options.capacity || 32,
+			def = poolFactory( constr, init, onAcquired,  onReleased, reset, capacity ),
 			acquireName = options.acquireName || "acquire",
 			releaseName = options.releaseName || "release",
 			disposeName = options.disposeName || "dispose",
