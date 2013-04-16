@@ -160,6 +160,7 @@ var esEngine = setProto( ESProto, function() {
 								last = links.pop();
 							if( _index !== links.length ) {
 								links[ _index ] = last;
+								last._index = _index;
 							}
 						}
 						this._e = entity;

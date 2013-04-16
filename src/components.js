@@ -178,6 +178,7 @@ var
 					last = links.pop();
 				if( _index !== links.length ) {
 					links[ _index ] = last;
+					last._index = _index;
 				}
 			}
 			this._c = component;
