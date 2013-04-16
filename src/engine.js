@@ -54,12 +54,12 @@ var esEngine = function() {
 			// {es,bag}.newEntity( component... )
 			newEntity = function() {
 				var args = arguments,
-					length = args.length,
+					nbArgs = args.length,
 					entity = entitiesManager.acquire();
 				
-				if( length === 0 ) throw "An entity cannot exist without a component";
+				if( nbArgs === 0 ) throw "An entity cannot exist without a component";
 				
-				for( var i = 0; i < length; i++ ) {
+				for( var i = 0; i < nbArgs; i++ ) {
 					args[i].$addTo( entity );
 				}
 				return entity;
@@ -67,9 +67,9 @@ var esEngine = function() {
 			// {es,bag}.disposeEntity( entity... )
 			disposeEntity = function() {
 				var args = arguments,
-					argsLength = args.length;
+					nbArgs = args.length;
 				
-				for( var i = 0; i < argsLength; i++ ) {
+				for( var i = 0; i < nbArgs; i++ ) {
 					disposeOneEntity( args[i] );
 				}
 			},
@@ -280,10 +280,10 @@ var esEngine = function() {
 				disposeEntitiesFrom: function() {},
 				has: function() {
 					var args = arguments,
-						length = args.length,
+						nbArgs = args.length,
 						nbEntities = allEntities.length,
 						i;
-					for( i = 0; i < length; i++ ) {
+					for( i = 0; i < nbArgs; i++ ) {
 						if( args[i] >= nbEntities || allEntities_bitsSet[ args[i] ] === -1 ) {
 							return false;
 						}

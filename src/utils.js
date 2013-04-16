@@ -33,10 +33,10 @@ var
 	// Like jQuery.extend() (Deep is unsupported):
 	extend = function( src ) {
 		var args = arguments,
-			argsLength = args.length,
+			nbArgs = args.length,
 			obj,
 			key;
-		for( var i = 1; i < argsLength; i++ ) {
+		for( var i = 1; i < nbArgs; i++ ) {
 			obj = args[i];
 			for( key in obj ) {
 				src[key] = obj[key];
@@ -82,12 +82,12 @@ var
 	},
 	compactDefine = function( obj ) {
 		var args = arguments,
-			argsLength = args.length,
+			nbArgs = args.length,
 			descriptor,
 			props,
 			keys,
 			key;
-		for( var i = 1; i < argsLength; i += 2 ) {
+		for( var i = 1; i < nbArgs; i += 2 ) {
 			descriptor = args[ i ];
 			props = args[ i + 1 ];
 			if( !descriptor ) {
@@ -123,45 +123,45 @@ var
 	},
 	definePropertiesUnwriteable = function( object ) {
 		var args = arguments,
-			length = args.length;
-		for( var i = 1; i < length; i++ ) {
+			nbArgs = args.length;
+		for( var i = 1; i < nbArgs; i++ ) {
 			Object_defineProperty( object, args[i], defPropsUnwriteable );
 		}
 	},
 	definePropertiesUnenumerable = function( object ) {
 		var args = arguments,
-			length = args.length;
-		for( var i = 1; i < length; i++ ) {
+			nbArgs = args.length;
+		for( var i = 1; i < nbArgs; i++ ) {
 			Object_defineProperty( object, args[i], defPropsUnenumerable );
 		}
 	},
 	definePropertiesUnenumerableUnwriteable = function( object ) {
 		var args = arguments,
-			length = args.length;
-		for( var i = 1; i < length; i++ ) {
+			nbArgs = args.length;
+		for( var i = 1; i < nbArgs; i++ ) {
 			Object_defineProperty( object, args[i], defPropsUnenumerableUnwriteable );
 		}
 	},
 	preventExtensionsProperties = function( object ) {
 		var args = arguments,
-			length = args.length;
-		for( var i = 1; i < length; i++ ) {
+			nbArgs = args.length;
+		for( var i = 1; i < nbArgs; i++ ) {
 			Object_preventExtensions( object[args[i]] );
 			Object_defineProperty( object, args[i], defPropsUnwriteable );
 		}
 	},
 	freezeProperties = function( object ) {
 		var args = arguments,
-			length = args.length;
-		for( var i = 1; i < length; i++ ) {
+			nbArgs = args.length;
+		for( var i = 1; i < nbArgs; i++ ) {
 			Object_freeze( object[args[i]] );
 			Object_defineProperty( object, args[i], defPropsUnwriteable );
 		}
 	},
 	freezeObjectAndProperties = function(object) {
 		var args = arguments,
-			length = args.length;
-		for(var i = 1; i - length; i++) {
+			nbArgs = args.length;
+		for(var i = 1; i - nbArgs; i++) {
 			Object_freeze( object[args[i]] );
 		}
 		return Object_freeze(object);

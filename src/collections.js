@@ -2,10 +2,10 @@
 var BagProto = compactDefine({
 		add: function() {
 			var args = arguments,
-				length = args.length,
+				nbArgs = args.length,
 				entities = this._e,
 				i;
-			for( i = 0; i < length; i++ ) {
+			for( i = 0; i < nbArgs; i++ ) {
 				this.addOne( args[i] );
 			}
 		},
@@ -20,10 +20,10 @@ var BagProto = compactDefine({
 		},
 		remove: function() {
 			var args = arguments,
-				length = args.length,
+				nbArgs = args.length,
 				entities = this._e,
 				i;
-			for( i = 0; i < length; i++ ) {
+			for( i = 0; i < nbArgs; i++ ) {
 				this.removeOne( args[i] );
 			}
 		},
@@ -38,10 +38,10 @@ var BagProto = compactDefine({
 		},
 		has: function() {
 			var args = arguments,
-				length = args.length,
+				nbArgs = args.length,
 				entities = this._e,
 				i;
-			for( i = 0; i < length; i++ ) {
+			for( i = 0; i < nbArgs; i++ ) {
 				if( !entities[ args[i] ]) return false;
 			}
 			return true;
