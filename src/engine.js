@@ -7,10 +7,16 @@ var
 
 // Function that creates a new es.
 // This function will be exported to the global object.
+// Structure of the function:
+// - entities
+// - ComponentCreators
+// - Bags
+// - es.entities
 var esEngine = function() {
 		
 		// #### Create the "es" that will be returned:
 		var es = Object_create( ESProto );
+		
 		
 		
 		// #### Create structures that will manage the entities
@@ -107,6 +113,7 @@ var esEngine = function() {
 			if( entitiesManager.acquire() !== 0 ) throw "First entity must be 0";
 		
 		
+		
 		// #### Create structures for managing components.
 		// Each type of component has an id, the creatorId.
 		// This id is used to efficiently store and retrieve components from arrays and maps.
@@ -150,13 +157,20 @@ var esEngine = function() {
 						// Cache reference (used in constr):
 						set = cDef._set,
 						
+						instanceProperties = {
+							// The entity of the component (See: component.$entity ):
+							$e: {
+								writable: true,
+								enumerable: false,
+								value: 0
+							}
+						},
 						// Component constructor (used directly in the poolFactory)
 						constr = function() {
 							var component = Object_create( proto );
+							Object_defineProperties( component, instanceProperties );
 							set( component );	// Set the default attributes.
-							component.$e = 0;	// The entity of the component (See: component.$entity ).
 							// Now we lock the component:
-							Object_defineProperty( component, "$e", defPropsUnenumerable );
 							Object_preventExtensions( component );
 							return component;
 						},
@@ -210,6 +224,7 @@ var esEngine = function() {
 					
 					// Add properties and methods to the creator:
 					compactDefine( creator, defPropsUnenumerableUnwriteable, {
+						_es: es,
 						_id: creatorId
 					}, defPropsUnwriteable, {
 						def: cDef,
@@ -222,6 +237,7 @@ var esEngine = function() {
 				
 				return creator;
 			};
+		
 		
 		
 		// #### Create structures for managing bags.
@@ -271,6 +287,8 @@ var esEngine = function() {
 				return bag;
 			};
 		
+		
+		
 		// #### Create the special bag es.entities
 		// It doesn't need to store it's own entities (no ._e property).
 		// Many methods are deactivated because they don't make sense.
@@ -319,12 +337,13 @@ var esEngine = function() {
 		entities.dispose = unsupportedOperationFunc;
 		
 		
+		
 		// #### Return the es, with all needed properties exposed:
 		return compactDefine( es, defPropsUnwriteable, {
-				componentCreator: componentCreator,
 				entities: entities,
-				bag: bag,
 				newEntity: newEntity,
-				disposeEntity: disposeEntity
+				disposeEntity: disposeEntity,
+				componentCreator: componentCreator,
+				bag: bag
 			});
 	};

@@ -4,6 +4,7 @@ var
 	Object_prototype = Object.prototype,
 	Object_create = Object.create,
 	Object_defineProperty = Object.defineProperty,
+	Object_defineProperties = Object.defineProperties,
 	Object_isPrototypeOf = Object.isPrototypeOf,
 	Object_preventExtensions = Object.preventExtensions,
 	Object_seal = Object.seal,
@@ -98,24 +99,23 @@ var
 			else {
 				var action = noopFunc;
 				if( descriptor.descriptors ) {
-					for( key in props ) {
-						Object_defineProperty( obj, key, props[key] );
+					Object_defineProperties( obj, props );
+				}
+				else {
+					if( descriptor.preventExtensions ) {
+						action = Object_preventExtensions;
 					}
-					continue;
-				}
-				if( descriptor.preventExtensions ) {
-					action = Object_preventExtensions;
-				}
-				if( descriptor.seal ) {
-					action = Object_seal;
-				}
-				if( descriptor.freeze ) {
-					action = Object_freeze;
-				}
-				for( key in props ) {
-					obj[key] = props[key];
-					Object_defineProperty( obj, key, descriptor );
-					action( obj[key] );
+					if( descriptor.seal ) {
+						action = Object_seal;
+					}
+					if( descriptor.freeze ) {
+						action = Object_freeze;
+					}
+					for( key in props ) {
+						obj[key] = props[key];
+						Object_defineProperty( obj, key, descriptor );
+						action( obj[key] );
+					}
 				}
 			}
 		}

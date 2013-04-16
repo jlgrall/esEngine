@@ -6,18 +6,8 @@ var
 	// Prototype for all componentDefs:
 	ComponentDefProto = Object_freeze( {} ),
 	
-	// Prototype for all components:
-	ComponentProto = Object_freeze({
-		get $entity() {
-			return this.$e;
-		},
-		set $entity(val) {
-			unsupportedOperationFunc();
-		}
-	});
-
-
-var ComponentDef = function( objectDef ) {
+	// esEngine.ComponentDef( objectDef ):
+	ComponentDef = function( objectDef ) {
 	
 		var name = objectDef.name;
 	
@@ -132,3 +122,15 @@ var analyseAttr = function( name, attr ) {
 			}
 		};
 	};
+
+
+var 
+	// Prototype for all components:
+	ComponentProto = Object_freeze({
+		get $entity() {
+			return this.$e;
+		},
+		set $entity( val ) {
+			unsupportedOperationFunc();
+		}
+	});
