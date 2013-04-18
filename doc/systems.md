@@ -48,9 +48,6 @@ Throws an error if the tag is already taken for the system name.
 ### .def
 A reference to the SystemDef of this system.
 
-### .name
-Name of the system.
-
 ### .tag
 Tag of the system. The default tag is "", the empty string.
 
