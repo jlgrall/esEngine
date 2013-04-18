@@ -11,6 +11,7 @@ var
 // - entities
 // - eLinks
 // - ComponentCreators
+// - Systems
 // - Selectors
 // - Bags
 // - es.entities
@@ -382,6 +383,75 @@ var esEngine = setProto( ESProto, function() {
 			};
 		
 		
+		// ### Systems
+		var 
+			allSystems = {},
+			
+			SystemESProto = compactCreate( SystemProto, defPropsUnwritable, {
+				dispose: function() {
+					if( this.onDisposed ) this.onDisposed();
+					
+					var name = this.def.name;
+					var tag = this.tag;
+					delete allSystems[ name ][ tag ];
+				}
+			}),
+			
+			system = setProto( SystemESProto, function( sDef, bag ) {
+				var args = Array_proto_slice.call( arguments, 1 );
+				if( !isPrototypeOf( BagProto, bag ) ) {
+					bag = entities;
+					args.unshift( bag );
+				}
+				
+				// Find sDef, name and tag:
+				var name;
+				var tag = "";
+				if( isArray( sDef ) ) {
+					if( sDef.length > 1 ) tag = sDef[1];
+					sDef = sDef[0];
+				}
+				if( isString( sDef ) ) {
+					var tagIndex = sDef.indexOf( ":" );
+					if( tagIndex === -1 ) tagIndex = sDef.length;
+					else tag = sDef.substring( tagIndex + 1 );
+					name = sDef.substring( 0, tagIndex );
+					sDef = esEngine_sDefs[ name ];
+					if( !sDef ) throw "SystemDef not found: " + name;
+				}
+				
+				if( !isPrototypeOf( SystemDefProto, sDef ) ) throw "Not a valid SystemDef: " + sDef;
+				if( !isString( tag ) )  throw "Not a valid tag: " + tag;
+				if( tag.indexOf( ":" ) !== -1 ) throw "A tag should not contain the \":\" character: " + tag;
+				
+				name = sDef.name;
+				
+				if( !allSystems[ name ] ) allSystems[ name ] = {};
+				if( allSystems[ name ][ tag ] ) throw "There is already a system with the same tag: " + allSystems[ name ][ tag ];
+				
+				// Find the ComponentCreators:
+				var creators = toCreators( es, sDef.cDefs, [] );
+				args.push.apply( args, creators );
+				
+				// Create the system:
+				var system = compactCreate( SystemESProto, defPropsUnwritable, {
+					def: sDef,
+					tag: tag
+				}, defPropsUnenumerableUnwritable, {
+					_es: es
+				});
+				
+				// Init the system:
+				sDef.init.apply( system, args );
+				
+				if( !isFunction( system.execute ) ) throw "Systems must have an \"execute()\" method";
+				
+				allSystems[ name ][ tag ] = system;
+				
+				return system;
+			});
+		
+		
 		
 		// ### Selectors
 		var allSelectors = [],
@@ -687,6 +757,7 @@ var esEngine = setProto( ESProto, function() {
 				disposeEntity: disposeEntity,
 				componentCreator: componentCreator,
 				cLink: cLink,
+				system: system,
 				selector: Selector,
 				anySelector: anySelector,
 				bag: Bag

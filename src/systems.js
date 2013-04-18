@@ -50,3 +50,11 @@ var
 	});
 
 Object_freeze( SystemDefProto );
+
+
+var 
+	// Prototype for all systems:
+	SystemProto = {
+	};
+
+Object_freeze( SystemProto );
