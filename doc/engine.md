@@ -27,7 +27,7 @@ A special Bag named "*" containing all the entities managed by this engine.
 You cannot directly add or remove entities from this bag (do it through `bag.newEntity()` and `component.$dispose()`).  
 _Note: the name of this bag may change in a future release._
 
-### .destroyEngine()
+### .disposeEngine()
 Destroys the engine and releases all its ressources.
 
 ### es.newEntity( component... )

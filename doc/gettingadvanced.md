@@ -22,9 +22,9 @@ var updateGroup = es.systemGroup( "update" ),
 updateGroup.append( movementGroup, "KillAtEdge", "SpawnRandomMoveables" );
 movementGroup.append( "Follow", "Move" );
 
-// Another more readeable way using arrays.
-// Each array will be translated into a new SystemGroup,
-// and the first string of each array is the group name.
+// Another more readable way using arrays.
+// Each sub array will also be translated into a new SystemGroup,
+// and the first string of each array is the SystemGroup name.
 updateGroup = es.systemGroup( [ "update",
 	[ "movement",
 		"Follow",
@@ -88,7 +88,7 @@ For example, let's add another KillAtEdge system, but with a smaller area:
 
 ```JavaScript
 // The tag is "smaller":
-var killSmallerSys = es.newSystem( "KillAtEdge:smaller", 50, 50 );
+var killSmallerSys = es.system( "KillAtEdge:smaller", 50, 50 );
 
 // Add it to the update group, after the 
 // system "KillAtEdge" with the default empty tag:
@@ -108,7 +108,7 @@ You can choose a different bag than the default `es.entities` for your system. J
 ```JavaScript
 // We want to run a parallel world:
 var parallelBag = es.bag( "Parallel world" )
-	moveParaSys = es.newSystem( "Move:parallel", parallelBag, false );
+	moveParaSys = es.system( "Move:parallel", parallelBag, false );
 ```
 
 Combined with tags, it can be very useful.

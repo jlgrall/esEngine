@@ -201,9 +201,9 @@ You can use another name if you want, but I recommend using `es`: simple and eas
 You can pass the additional arguments expected by the system's `init` function. In our case, `reverseSpeed` is set to false at the beginning.
 
 ```JavaScript
-var moveSys = es.newSystem( "Move", false ),
-	spawnSys = es.newSystem( "SpawnRandomMoveables", 200, 200 ),
-	killSys = es.newSystem( "KillAtEdge", 200, 200 );
+var moveSys = es.system( "Move", false ),
+	spawnSys = es.system( "SpawnRandomMoveables", 200, 200 ),
+	killSys = es.system( "KillAtEdge", 200, 200 );
 ```
 
 Now you have your systems. You can access their methods, for example:
@@ -307,7 +307,7 @@ esEngine.SystemDef({
 	}
 });
 
-var	followSys = es.newSystem( "Follow" );
+var	followSys = es.system( "Follow" );
 ```
 
 Here is how you can use `cLink` and `eLink`:
