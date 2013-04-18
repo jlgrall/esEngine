@@ -11,7 +11,7 @@ var
 	
 		var name = objectDef.name;
 	
-		if( !isString( name ) ) throw "A component must have a name.";
+		if( !isString( name ) ) throw "A component must have a name";
 		if( name in esEngine_cDefs ) throw "A ComponentDef already exists with the name: " + name;
 	
 		var 

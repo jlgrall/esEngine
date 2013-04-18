@@ -13,9 +13,10 @@ var
 			_cDefs = objectDef.cDefs,
 			init = objectDef.init;
 	
-		if( !isString( name ) ) throw "A system must have a name.";
-		if( !isArray( _cDefs ) ) throw "A system must have a cDefs array.";
-		if( !isFunction( init ) ) throw "A system must have an init function.";
+		if( !isString( name ) ) throw "A system must have a name";
+		if( name.length === 0 ) throw "A system must have a non empty name";
+		if( !isArray( _cDefs ) ) throw "A system must have a cDefs array";
+		if( !isFunction( init ) ) throw "A system must have an init function";
 	
 		if( name in esEngine_sDefs ) throw "A SystemDef already exists with the name: " + name;
 	
@@ -30,7 +31,7 @@ var
 				if( !esEngine_cDefs[ cDef ] ) throw "No ComponentDef found with name: " + cDef;
 				cDef = esEngine_cDefs[ cDef ];
 			}
-			if( !( isPrototypeOf( ComponentDefProto, cDef ) ) ) throw "cDef is not a valid ComponentDef";
+			if( !( isPrototypeOf( ComponentDefProto, cDef ) ) ) throw "Not a valid ComponentDef: " + cDef;
 			cDefs.push( cDef );
 		}
 	

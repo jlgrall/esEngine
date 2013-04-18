@@ -14,18 +14,9 @@ exports.APITest = function(test) {
 	
 	//test.expect(1);
 	
-	var currentName = function() {
-		return currentName.cName;
-	};
-	currentName.cId = -1;
-	currentName.cName = undefined;
-	currentName.next = function() {
-		currentName.cName = "CollectionName_" + (++currentName.cId);
-		return currentName.cName;
-	};
-	
 	
 	// STARTING THE TEST:
+	
 	
 	var cDefProduct = esEngine.ComponentDef( {
 			name: "Product",

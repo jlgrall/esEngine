@@ -9,9 +9,10 @@ var
 	Object_preventExtensions = Object.preventExtensions,
 	Object_seal = Object.seal,
 	Object_freeze = Object.freeze,
-	Object_toString = Object_prototype.toString,
+	Object_proto_toString = Object_prototype.toString,
 	Object_keys = Object.keys,
-	Array_prototype = Array.prototype;
+	Array_prototype = Array.prototype,
+	Array_proto_slice = Array_prototype.slice;
 
 
 // Simple utility functions:
@@ -20,7 +21,7 @@ var
 		return typeof value === "string" || value instanceof String;
 	},
 	isArray = Array.isArray || function ( value ) {
-		return Object_toString.call( value ) === "[object Array]";
+		return Object_proto_toString.call( value ) === "[object Array]";
 	},
 	isFunction = function( value ) {
 		return typeof value == 'function';
