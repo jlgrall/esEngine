@@ -35,17 +35,11 @@ updateGroup = es.executableGroup( [ "update",
 ] );
 
 // We can get any element:
-updateGroup = updateGroup.get( "." );
 movementGroup = updateGroup.get( "movement" );
 moveSys = updateGroup.get( "movement.Move" );
 
 // This will return null:
 var doesNotExists = updateGroup.get( "doesNotExists" );
-
-// Actually, the following will both work:
-moveSys = updateGroup.get( "movement.Move" );
-moveSys = updateGroup.get( "Move" );
-// Because system names are unique.
 ```
 
 Now that you have your groups, you can use some new features:
@@ -58,16 +52,16 @@ updateGroup.execute( time, elapsed );
 updateGroup.pause( "SpawnRandomMoveables", "movement.Follow" );
 // Pause groups:
 updateGroup.pause( "movement" );
-updateGroup.pause( "." );	// Pauses updateGroup itself
-// This pauses each system and group directly under movementGroup,
-// but the group movementGroup is itself not modified:
-updateGroup.pause( "movement.*" );
 
 // Unpause:
-updateGroup.unpause( ".", "SpawnRandomMoveables", "movement", "movement.*" );
+updateGroup.unpause( "SpawnRandomMoveables", "movement", "movement.*" );
 
 // Time the execution of a system or group:
-updateGroup.time( "KillAtEdge", "movement.*" );
+updateGroup.time( "KillAtEdge" );
+
+// the following times each system and group
+// directly under movementGroup:
+updateGroup.time( "movement.*" );
 
 // Stop timing the executions:
 updateGroup.untime( "KillAtEdge", "movement.*" );
@@ -78,11 +72,11 @@ updateGroup.untime( "KillAtEdge", "movement.*" );
 
 ### Tags
 
-You can use multiple instances of the same SystemDef. Each system instance is distinguished by a tag. A tag is an extension to the system name.
+You can use multiple instances of the same SystemDef. Each system instance is distinguished by a different tag. Tags are added at the end of the system name like this: `MySystem:myTag`.
 
-By default, systems have the empty tag: "".
+When the tag is omitted, systems have the empty tag: "", and the tag separator (":") can be omitted too.
 
-For example, let's add another KillAtEdge system, but with a smaller area:
+For example, let's add another KillAtEdge system, but with a smaller area of only 50 x 50:
 
 ```JavaScript
 // The tag is "smaller":
@@ -91,22 +85,23 @@ var killSmallerSys = es.system( "KillAtEdge:smaller", 50, 50 );
 // Add it to the update group, after the 
 // system "KillAtEdge" with the default empty tag:
 updateGroup.after( "KillAtEdge", "KillAtEdge:smaller");
+// Now KillAtEdge:smaller will be executed just after KillAtEdge.
 
 // Pause the system:
 updateGroup.pause( "KillAtEdge:smaller" );
 // Now you can just pause and unpause whichever you want.
 ```
-
-Note: `"KillAtEdge"` and `"KillAtEdge:"` point to the same system. The ":" is omitted for simplicity.
+Note: you can use `"KillAtEdge:"` instead of `"KillAtEdge"`, it works too.
 
 ### Alternative bag
 
 You can choose a different bag than the default `es.entities` for your system. Just pass it after the system name:
 
 ```JavaScript
-// We want to run a parallel world:
-var parallelBag = es.bag( "Parallel world" )
-	moveParaSys = es.system( "Move:parallel", parallelBag, false );
+// We want to run a parallel world whose entities
+// are contained in a separate bag:
+var parallelBag = es.bag( "Parallel world bag" );
+var moveParaSys = es.system( "Move:parallel", parallelBag, false );
 ```
 
 Combined with tags, it can be very useful.
