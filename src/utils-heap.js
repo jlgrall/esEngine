@@ -1,4 +1,4 @@
-// IndexRecycler is like a pool, but for objects that are in an array.
+// Heap is like a pool, but for objects that are allocated and indexed in an array.
 // It keeps track of unused indexes and automatically grows or shrinks the array as needed.
 
 // Ideas ? :
@@ -7,111 +7,110 @@
 // - http://jsperf.com/binary-heap/3
 
 var 
-	// Prototype for IndexRecycler:
-	IndexRecyclerProto = {},
+	// Prototype for Heap:
+	HeapManagerProto = {},
 	
-	IndexRecycler = function( array, nextIndex, releasedIndex, reducedArray, options ) {
+	HeapManager = function( nextIndex, releasedIndex, reducedHeap, options ) {
 		
 		// Retrieve all options:
 		var 
-			// Length of the array:
-			length = options.length || array.length,
+			// The heap is an array:
+			heap = options.heap || [],
+			
+			// Length of the heap array:
+			length = options.length || heap.length,
 			
 			// isAvailable is a function that returns true when an index is available:
 			isAvailable = options.isAvailable || function( i ) {
-				return !!array[i];
+				return !!heap[i];
 			},
 			
-			// Tells the default expandArray() function by how much to expand the 
+			// Tells the default expandHeap() function by how much to expand the 
 			// array each time it is run.
 			expandAmount = options.expandAmount || 4,
 			
-			// expandArray is called when there are no more available indexes.
-			// It must return the new size of the array, and there MUST be an available
+			// expandHeap is called when there are no more available indexes.
+			// It must return the new size of the heap, and there MUST be an available
 			// index immediately at the position of the previous length.
-			// Arguments: expandAmount, length, expandedLength, array
-			expandArray = options.expandArray || function( expandAmount, length, expandedLength ) {
+			// Arguments: expandAmount, length, expandedLength, heap
+			expandHeap = options.expandHeap || function( expandAmount, length, expandedLength ) {
 				for( var i = length; i < expandedLength; i++ ) {
-					array[i] = undefined;
+					heap[i] = undefined;
 				}
 				return expandedLength;
 			},
 			
 			// Arguments: expandedLength
-			onArrayExpanded = options.onArrayExpanded || noopFunc,
+			onHeapExpanded = options.onHeapExpanded || noopFunc,
 			
-			// Tells the default reduceArray() function what is the maximum number of available
-			// indexes at the end, before it actually shrinks the array.
-			maxTrailingAvailable = options.maxTrailingAvailable || 16,
+			// Tells the default reduceHeap() function what is the maximum number of available
+			// indexes at the end, before it actually shrinks the heap.
+			maxTrailingAllowed = options.maxTrailingAllowed || 16,
 			
-			// Tells the default reduceArray() function how much space to keep
-			// at the end of the array when it is run.
+			// Tells the default reduceHeap() function how much space to keep
+			// at the end of the heap when it is run.
 			reduceAmount = options.reduceAmount || 4,
 			
-			// reduceArray is called each time a last index of the array is released.
-			// It must return the new size of the array. minLength is the minimum length
-			// currently required by the array.
-			// Arguments: reduceAmount, length, reducedLength, array, trailingAvailable
-			reduceArray = options.reduceArray || function( reduceAmount ) {
-				return array.length -= reduceAmount;
+			// reduceHeap is called each time a last index of the heap is released.
+			// It must return the new size of the heap. minLength is the minimum length
+			// currently required by the heap.
+			// Arguments: reduceAmount, length, reducedLength, heap, trailingAvailable
+			reduceHeap = options.reduceHeap || function( reduceAmount ) {
+				return heap.length -= reduceAmount;
 			},
 			
 			// Arguments: reducedLength
-			onArrayReduced = options.onArrayReduced || noopFunc,
+			onHeapReduced = options.onHeapReduced || noopFunc,
 			
 			// onAcquired is called for every acquired index.
-			// Arguments: index, array
+			// Arguments: index, heap
 			onAcquired = options.onAcquired || noopFunc,
 		
 			// onAcquired is called for every released index.
-			// Arguments: index, array
+			// Arguments: index, heap
 			onReleased = options.onReleased || noopFunc;
 		
 		
 		var 
-			// Keep track of the higher used index, so we know when the array can be shrunk:
+			// Keep track of the higher used index, so we know when the heap can be shrunk:
 			higherUsed = -1,
 			
-			nbUsed = 0,
+			nbActive = 0,
 			
 			makeNextAvailable = function() {
 				var next = length;
-				length = expandArray( expandAmount, length, length + expandAmount, array );
-				onArrayExpanded( length );
+				length = expandHeap( expandAmount, length, length + expandAmount, heap );
+				onHeapExpanded( length );
 				return next;
 			},
 			
-			// Create the IndexRecycler:
-			indexRecycler = compactCreate( IndexRecyclerProto, defDescriptors, {
-				used: {
-					get: function() {
-						return nbUsed;
-					},
-					set: unsupportedOperationFunc
-				}
-			}, defPropsUnwritable, {
+			// Create the Heap:
+			heapManager = compactCreate( HeapManagerProto, defPropsUnwritable, {
+				getNbActive: function() {
+					return nbActive;
+				},
 				acquire: function() {
 					var index = nextIndex();
-					nbUsed++;
+					nbActive++;
 					if( higherUsed < index ) higherUsed = index;
-					onAcquired( index, array );
+					onAcquired( index, heap );
 					return index;
 				},
 				release: function( index ) {
-					onReleased( index, array );
+					onReleased( index, heap );
 					releasedIndex( index );
-					nbUsed--;
+					nbActive--;
 					if( index === higherUsed ) {
 						do {
 							higherUsed--;
 						} while( isAvailable( higherUsed ) );
 						var trailingAvailable = length - ( higherUsed + 1 );
-						if( trailingAvailable > maxTrailingAvailable ) {
-							var newLength = reduceArray( reduceAmount, length, length - reduceAmount, array, trailingAvailable );
+						if( trailingAvailable > maxTrailingAllowed ) {
+							var newLength = reduceHeap( reduceAmount, length, length - reduceAmount, heap, trailingAvailable );
 							if( newLength < length ) {
 								length = newLength;
-								reducedArray( length );
-								onArrayReduced( length );
+								reducedHeap( length );
+								onHeapReduced( length );
 							}
 						}
 					}
@@ -134,12 +133,12 @@ var
 				makeNextAvailable: makeNextAvailable
 			});
 		
-		return indexRecycler;
+		return heapManager;
 	};
 
 
 var 
-	SimpleIndexRecycler = function( array, options ) {
+	SimpleHeap = function( options ) {
 		options =  options || {};
 		
 		var 
@@ -157,17 +156,17 @@ var
 			releasedIndex = function( index ) {
 				if( index < lowerAvailable ) lowerAvailable = index;
 			},
-			// Called when the array is reduced:
-			reducedArray = noopFunc;
+			// Called when the heap is reduced:
+			reducedHeap = noopFunc;
 		
-		var indexRecycler = IndexRecycler( array, nextIndex, releasedIndex, reducedArray, options ),
-			nextAvailable = indexRecycler.nextAvailable,
-			nextAvailableAutoExpand = indexRecycler.nextAvailableAutoExpand;
+		var heapManager = HeapManager( nextIndex, releasedIndex, reducedHeap, options ),
+			nextAvailable = heapManager.nextAvailable,
+			nextAvailableAutoExpand = heapManager.nextAvailableAutoExpand;
 		
-		return indexRecycler;
+		return heapManager;
 	},
 	
-	BufferedIndexRecycler = function( array, options ) {
+	BufferedHeap = function( options ) {
 		options =  options || {};
 		
 		var 
@@ -211,16 +210,16 @@ var
 			releasedIndex = function( index ) {
 				if( index < lowerAvailable ) lowerAvailable = index;
 			},
-			// Called when the array is reduced:
-			reducedArray = function( length ) {
+			// Called when the heap is reduced:
+			reducedHeap = function( length ) {
 				// Trims the buffer of indexes higher than length.
 				// It works because the buffer is always sorted.
 				while( buffer[ bufferCount - 1 ] >= length ) bufferCount--;
 			};
 		
-		var indexRecycler = IndexRecycler( array, nextIndex, releasedIndex, reducedArray, options ),
-			nextAvailable = indexRecycler.nextAvailable,
-			makeNextAvailable = indexRecycler.makeNextAvailable;
+		var heapManager = HeapManager( nextIndex, releasedIndex, reducedHeap, options ),
+			nextAvailable = heapManager.nextAvailable,
+			makeNextAvailable = heapManager.makeNextAvailable;
 		
-		return indexRecycler;
+		return heapManager;
 	};

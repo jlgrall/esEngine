@@ -3,7 +3,7 @@
 esEngine.version = version;
 
 esEngine.ArrayOfBitArray = ArrayOfBitArray;
-esEngine.BufferedIndexRecycler = BufferedIndexRecycler;
+esEngine.BufferedHeap = BufferedHeap;
 
 //esEngine._cDefs = esEngine_cDefs;
 esEngine.ComponentDef = ComponentDef;

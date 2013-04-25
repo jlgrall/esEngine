@@ -34,12 +34,13 @@ var esEngine = setProto( ESProto, function() {
 			// I use a simple hack in the underlying bitArray
 			// of each entity: available entities returns that
 			// they possess -1 components.
-			entitiesManager = BufferedIndexRecycler( allEntities, {
+			entitiesHeap = BufferedHeap( {
+				heap: allEntities,
 				bufferSize: 128,
 				isAvailable: function( index ) {
 					return allEntities_bitsSet[ index ] === -1;
 				},
-				expandArray: function( expandAmount, length, expandedLength, array ) {
+				expandHeap: function( expandAmount, length, expandedLength, array ) {
 					allEntities.length += expandAmount;
 					for( var i = length; i < expandedLength; i++ ) {
 						allEntities_bitsSet[i] = -1;
@@ -51,7 +52,7 @@ var esEngine = setProto( ESProto, function() {
 				expandAmount: 128,
 				// When there are unused entities at the end, shrink the array
 				// by 256, but not before there are more than 512 unused at the end.
-				maxTrailingAvailable: 512,
+				maxTrailingAllowed: 512,
 				reduceAmount: 256,
 				onAcquired: function( index ) {
 					allEntities_bitsSet[ index ] = 0;
@@ -65,7 +66,7 @@ var esEngine = setProto( ESProto, function() {
 			newEntity = function() {
 				var args = arguments,
 					nbArgs = args.length,
-					entity = entitiesManager.acquire();
+					entity = entitiesHeap.acquire();
 				
 				if( nbArgs === 0 ) throw "An entity cannot exist without a component";
 				
@@ -120,7 +121,7 @@ var esEngine = setProto( ESProto, function() {
 				}
 				
 				// The entity can be reused now:
-				entitiesManager.release( entity );
+				entitiesHeap.release( entity );
 			},
 			// Internal. Disposes a component.
 			disposeComponent = function( componentId, entity ) {
@@ -129,7 +130,7 @@ var esEngine = setProto( ESProto, function() {
 			
 			// Acquire and discard the entity with id 0,
 			// because entity ids must start at 1
-			if( entitiesManager.acquire() !== 0 ) throw "First entity must be 0";
+			if( entitiesHeap.acquire() !== 0 ) throw "First entity must be 0";
 		
 		
 		
@@ -235,7 +236,7 @@ var esEngine = setProto( ESProto, function() {
 		var 
 			// Keep all ComponentCreators (simply referred as "creators"):
 			allCreators = RecycledIndexedNamedList({
-				onArrayExpanded: function( length ) {
+				onHeapExpanded: function( length ) {
 					if( length > allEntities.size ) {
 						var size = Math.ceil( length / INTEGERBITS ) * INTEGERBITS;
 						allEntities.size = size;
@@ -243,7 +244,7 @@ var esEngine = setProto( ESProto, function() {
 						allSelectorsNot.size = size;
 					}
 				},
-				onArrayReduced: function( length ) {
+				onHeapReduced: function( length ) {
 					// Removing creators is not in the API.
 				}
 			}),

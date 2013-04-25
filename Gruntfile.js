@@ -24,7 +24,7 @@ module.exports = function(grunt) {
 					'src/utils-bitarray.js',
 					'src/utils-pool.js',
 					'src/utils-recycledindexedlist.js',
-					'src/utils-indexrecycler.js',
+					'src/utils-heap.js',
 					'src/engine.js',
 					'src/entities.js',
 					'src/components.js',

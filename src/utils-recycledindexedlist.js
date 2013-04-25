@@ -44,11 +44,11 @@ var RecycledIndexedListProto = {
 	},
 	RecycledIndexedList = function( indexRecyclerOptions ) {
 		var 
-			// Map is a dense array too, because the use of a SimpleIndexRecycler 
+			// Map is a dense array too, because the use of a SimpleHeap 
 			// makes sure that all indexes are used efficiently (ie. holes are reused).
 			// Map can have some elements set to undefined though.
 			map = [],
-			indexRecycler = SimpleIndexRecycler( map, indexRecyclerOptions ),
+			indexRecycler = SimpleHeap( map, indexRecyclerOptions ),
 			list = compactCreate( RecycledIndexedListProto, defProps, {
 				array: [],
 				map: map
