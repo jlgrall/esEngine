@@ -4,28 +4,28 @@ Getting advanced
 
 Introduction to some of the more advanced features of esEngine:
 
-1. SystemGroup: manage your systems
+1. ExecutableGroup: manage your systems
 1. Multiple instances of the same systems (Tags, Alternative bag)
 1. Selectors
 1. Collections (Bag, Query and LiveQuery, IdMap)
 1. Direct references
 
 
-## SystemGroup: manage your systems
+## ExecutableGroup: manage your systems
 
-When you start to have a lot of systems or if you want a more powerful management of system, use `SystemGroup`. A `SystemGroup` can be composed of systems and other `SystemGroup`.
+When you start to have a lot of systems or if you want a more powerful management of systems, use `ExecutableGroup`. An `ExecutableGroup` can be composed of systems and other `ExecutableGroup`.
 
 ```JavaScript
-var updateGroup = es.systemGroup( "update" ),
-	movementGroup = es.systemGroup( "movement" );
+var updateGroup = es.executableGroup( "update" ),
+  movementGroup = es.executableGroup( "movement" );
 
-updateGroup.append( movementGroup, "KillAtEdge", "SpawnRandomMoveables" );
 movementGroup.append( "Follow", "Move" );
+updateGroup.append( movementGroup, "KillAtEdge", "SpawnRandomMoveables" );
 
 // Another more readable way using arrays.
-// Each sub array will also be translated into a new SystemGroup,
-// and the first string of each array is the SystemGroup name.
-updateGroup = es.systemGroup( [ "update",
+// Each sub array will also be translated into a new ExecutableGroup,
+// and the first string of each array is the ExecutableGroup name.
+updateGroup = es.executableGroup( [ "update",
 	[ "movement",
 		"Follow",
 		"Move"
@@ -55,9 +55,7 @@ Now that you have your groups, you can use some new features:
 updateGroup.execute( time, elapsed );
 
 // Pause systems (it won't be execute by the group):
-updateGroup.pause( "SpawnRandomMoveables", "Follow" );
-
-
+updateGroup.pause( "SpawnRandomMoveables", "movement.Follow" );
 // Pause groups:
 updateGroup.pause( "movement" );
 updateGroup.pause( "." );	// Pauses updateGroup itself

@@ -42,8 +42,8 @@ Get a ComponentCreator. See: ComponentCreator.
 ### es.system( SystemDef, [bag], args... )
 Creates a new system. See: System.
 
-### es.systemGroup( name )
-Creates a new SystemGroup. See: SystemGroup.
+### es.executableGroup( name )
+Creates a new ExecutableGroup. See: ExecutableGroup.
 
 ### es.eLink( [entity] )
 Creates a new eLink. See: eLink.
