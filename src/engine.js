@@ -12,6 +12,7 @@ var
 // - eLinks
 // - ComponentCreators
 // - Systems
+// - ExecutableGroups
 // - Selectors
 // - Bags
 // - es.entities
@@ -387,25 +388,33 @@ var esEngine = setProto( ESProto, function() {
 		var 
 			allSystems = {},
 			
+			canonicalName = function( name ) {
+				var lastChar = name.length - 1;
+				if( name.charAt( lastChar ) === ":" ) name = name.substring( 0, lastChar );
+				return name;
+			},
+			
+			findSystem = function( name ) {
+				return allSystems[ canonicalName( name ) ] || null;
+			},
+			
 			SystemESProto = compactCreate( SystemProto, defPropsUnwritable, {
 				dispose: function() {
 					if( this.onDisposed ) this.onDisposed();
 					
-					var name = this.def.name;
-					var tag = this.tag;
-					delete allSystems[ name ][ tag ];
+					delete allSystems[ this.name ];
 				}
 			}),
 			
-			system = setProto( SystemESProto, function( sDef, bag ) {
+			System = setProto( SystemESProto, function( sDef, bag ) {
 				var args = Array_proto_slice.call( arguments, 1 );
 				if( !isPrototypeOf( BagProto, bag ) ) {
 					bag = entities;
 					args.unshift( bag );
 				}
 				
-				// Find sDef, name and tag:
-				var name;
+				// Find sDef, its name and the tag:
+				var sDefName;
 				var tag = "";
 				if( isArray( sDef ) ) {
 					if( sDef.length > 1 ) tag = sDef[1];
@@ -415,19 +424,19 @@ var esEngine = setProto( ESProto, function() {
 					var tagIndex = sDef.indexOf( ":" );
 					if( tagIndex === -1 ) tagIndex = sDef.length;
 					else tag = sDef.substring( tagIndex + 1 );
-					name = sDef.substring( 0, tagIndex );
-					sDef = esEngine_sDefs[ name ];
-					if( !sDef ) throw "SystemDef not found: " + name;
+					sDefName = sDef.substring( 0, tagIndex );
+					sDef = esEngine_sDefs[ sDefName ];
+					if( !sDef ) throw "SystemDef not found: " + sDefName;
 				}
 				
 				if( !isPrototypeOf( SystemDefProto, sDef ) ) throw "Not a valid SystemDef: " + sDef;
 				if( !isString( tag ) )  throw "Not a valid tag: " + tag;
 				if( tag.indexOf( ":" ) !== -1 ) throw "A tag should not contain the \":\" character: " + tag;
 				
-				name = sDef.name;
+				var name = sDef.name;
+				if( tag.length > 0 ) name += ":" + tag;
 				
-				if( !allSystems[ name ] ) allSystems[ name ] = {};
-				if( allSystems[ name ][ tag ] ) throw "There is already a system with the same tag: " + allSystems[ name ][ tag ];
+				if( allSystems[ name ] ) throw "There is already a system with the same name: " + allSystems[ name ];
 				
 				// Find the ComponentCreators:
 				var creators = toCreators( es, sDef.cDefs, [] );
@@ -436,6 +445,7 @@ var esEngine = setProto( ESProto, function() {
 				// Create the system:
 				var system = compactCreate( SystemESProto, defPropsUnwritable, {
 					def: sDef,
+					name: name,
 					tag: tag
 				}, defPropsUnenumerableUnwritable, {
 					_es: es
@@ -446,11 +456,260 @@ var esEngine = setProto( ESProto, function() {
 				
 				if( !isFunction( system.execute ) ) throw "Systems must have an \"execute()\" method";
 				
-				allSystems[ name ][ tag ] = system;
+				allSystems[ name ] = system;
 				
 				return system;
 			});
 		
+		
+		
+		// ### ExecutableGroups
+		var groupSep = ".",
+			isExecutable = function( arg ) {
+				return isString( arg.name ) && isFunction( arg.execute );
+			},
+			_getDeepestGroup = function( group, target, throwsError ) {
+				var targetLength = target.lastIndexOf( "." );
+				if( targetLength === -1 ) targetLength = 0;
+				var name;
+				var node;
+				var lastIndex = 0;
+				var index = 0;
+				while( index !== targetLength ) {
+					index = target.indexOf( groupSep, lastIndex );
+					if( index === -1 ) index = targetLength;
+					
+					name = target.substring( lastIndex, index );
+					node = group._byName[ name ];
+					if( node === undefined ) {
+						if( throwsError ) throw "Could not find target: " + name;
+						else return null;
+					}
+					
+					group = node.executable;
+					if( !isPrototypeOf( ExecutableGroupESProto, group ) ) throw "This is not an ExecutableGroup: " + group;
+					lastIndex = index + 1;
+				}
+				return group;
+			},
+			getNode  = function( group, target, throwsError ) {
+				if( !isString( target ) ) {
+					target = target.name;
+				}
+				group = _getDeepestGroup( group, target, throwsError );
+				var lastIndex = target.lastIndexOf( groupSep ) + 1;	// Works even if not found.
+				var name = target.substring( lastIndex );
+				var node = group._byName[ name ] || null;
+				if( node === null && throwsError ) throw "Could not find target: " + target;
+				return node;
+			},
+			getAllNodes = function( group, target, allNodes, throwsError ) {
+				if( !isString( target ) ) {
+					target = target.name;
+				}
+				group = _getDeepestGroup( group, target, throwsError );
+				var lastIndex = target.lastIndexOf( groupSep ) + 1;	// Works even if not found.
+				var name = target.substring( lastIndex );
+				if( name === "*" ) {
+					Array_proto_push.apply( allNodes, group.executables );
+				}
+				else {
+					var node = group._byName[ name ] || null;
+					allNodes.push( node );
+					if( node === null && throwsError ) throw "Could not find target: " + target;
+				}
+			},
+			parseExecSelect = function( group, args, allNodes, throwsError ) {
+				var nbArgs = args.length;
+				for( var i = 0; i < nbArgs; i++ ) {
+					getAllNodes( group, args[i], allNodes, throwsError );
+				}
+				return allNodes;
+			},
+			nextExecuted = function( group, fromIndex ) {
+				var executables = group._executables;
+				var nbExecutables = executables.length;
+				var execIndex = group._executed.length;
+				for( var i = fromIndex; i < nbExecutables; i++ ) {
+					var node = executables[i];
+					if( node.execIndex !== -1 ) {
+						execIndex = node.execIndex;
+						break;
+					}
+				}
+				return execIndex;
+			},
+			shiftExecutables = function( group, fromIndex, shiftExecutables, shiftExecuted ) {
+				var executables = group._executables;
+				var nbExecutables = executables.length;
+				for( var i = fromIndex; i < nbExecutables; i++ ) {
+					var node = executables[i];
+					node.index += shiftExecutables;
+					if( node.execIndex !== -1 ) node.execIndex += shiftExecuted;
+				}
+			},
+			shiftExecuted = function( group, fromIndex, shiftExecuted ) {
+				var executed = group._executed;
+				var nbExecuted = executed.length;
+				for( var i = fromIndex; i < nbExecuted; i++ ) {
+					var node = executed[i];
+					node.execIndex += shiftExecuted;
+				}
+			},
+			allNodesArray = [],
+			insertArray = [ -1, 0 ],
+			ExecutableGroupESProto = compactCreate( ExecutableGroupProto, defPropsUnwritable, {
+				append: function() {
+					this._insertAt( this._executables.length, arguments );
+					return this;
+				},
+				after: function( target ) {
+					var node = getNode( this, target, true );
+					node.group._insertAt( node.index + 1, arguments, 1 );
+					return this;
+				},
+				before: function( target ) {
+					var node = getNode( this, target, true );
+					node.group._insertAt( node.index, arguments, 1 );
+					return this;
+				},
+				remove: function() {
+					var allNodes = parseExecSelect( this, arguments, allNodesArray, true );
+					var nbNodes = allNodes.length;
+					for( var i = 0; i < nbNodes; i++ ) {
+						var node = allNodes[i];
+						var group = node.group;
+						var index = node.index;
+						delete group._byName[ node.name ];
+						group._executables.splice( index, 1 );
+						group._executed.splice( node.execIndex, 1 );
+						shiftExecutables( this, index, -1, -1 );
+					}
+					allNodesArray.length = 0;
+					return this;
+				},
+				has: function() {
+					var args = arguments;
+					var nbArgs = args.length;
+					for( var i = 0; i < nbArgs; i++ ) {
+						var node = getNode( this, args[i] );
+						if( node === null ) return false;
+					}
+					return true;
+				},
+				get: function( arg ) {
+					var node = getNode( this, arg );
+					return node === null ? null : node.executable;
+				},
+				pause: function() {
+					var allNodes = parseExecSelect( this, arguments, allNodesArray, true );
+					var nbNodes = allNodes.length;
+					for( var i = 0; i < nbNodes; i++ ) {
+						var node = allNodes[i];
+						var execIndex = node.execIndex;
+						if( execIndex !== -1 ) {
+							node.execIndex = -1;
+							var group = node.group;
+							group._executed.splice( execIndex, 1 );
+							shiftExecuted( group, execIndex, -1 );
+						}
+					}
+					allNodesArray.length = 0;
+					return this;
+				},
+				unpause: function() {
+					var allNodes = parseExecSelect( this, arguments, allNodesArray, true );
+					var nbNodes = allNodes.length;
+					for( var i = 0; i < nbNodes; i++ ) {
+						var node = allNodes[i];
+						var execIndex = node.execIndex;
+						if( execIndex === -1 ) {
+							var group = node.group;
+							execIndex = nextExecuted( group, node.index + 1 );
+							node.execIndex = execIndex;
+							group._executed.splice( execIndex, 0, node );
+							shiftExecuted( group, execIndex + 1, 1 );
+						}
+					}
+					allNodesArray.length = 0;
+					return this;
+				},
+				isPaused: function() {
+					var allNodes = parseExecSelect( this, arguments, allNodesArray, true );
+					var nbNodes = allNodes.length;
+					for( var i = 0; i < nbNodes; i++ ) {
+						var node = allNodes[i];
+						if( node.execIndex !== -1 ) return false;
+					}
+					allNodesArray.length = 0;
+					return true;
+				}
+			}, defPropsUnenumerableUnwritable, {
+				_insertAt: function( index, args, nbSkippedArgs ) {
+					if( !nbSkippedArgs ) nbSkippedArgs = 0;
+					var nbArgs = args.length;
+					var nbInsertions = nbArgs - nbSkippedArgs;
+					var executables = this._executables;
+					var nbExecutables = executables.length;
+					var byName = this._byName;
+					var executed = this._executed;
+					
+					var execIndex = nextExecuted( this, index );
+					
+					for( var i = nbSkippedArgs; i < nbArgs; i++ ) {
+						var arg = args[i];
+						if( isArray( arg ) ) arg = ExecutableGroup( arg );
+						else if( isString( arg ) ) {
+							arg = findSystem( arg );
+							if( arg === null ) throw "Could not find System: " + arg;
+						}
+						else if( !isExecutable( arg ) ) throw "This is not an Executable: " + arg;
+						if( byName[ arg.name ] ) throw "Already contains the name: " + arg.name;
+						var node = {
+							name: arg.name,
+							executable: arg,
+							group: this,
+							index: index + i,
+							execIndex: execIndex + i
+						};
+						byName[ arg.name ] = node;
+						insertArray[ i + 2 ] = node;
+					}
+					
+					shiftExecutables( this, index, nbInsertions, nbInsertions );
+					insertArray[0] = index;
+					Array_proto_splice.apply( executables, insertArray );
+					insertArray[0] = execIndex;
+					Array_proto_splice.apply( executed, insertArray );
+					
+					// Reset insertArray:
+					insertArray[0] = -1;
+					insertArray.length = 2;
+				}
+			}),
+			ExecutableGroup = function( name ) {
+				var array;
+				if( isArray( name ) ) {
+					array = Array_proto_slice.call( name , 1 );
+					name = name[0];
+				}
+				
+				if( !isString( name ) || name.length === 0 ) throw "ExecutableGroup must have a name";
+				
+				var executableGroup = compactCreate( ExecutableGroupESProto, defPropsUnwritable, {
+					name: name
+				}, defPropsUnenumerableUnwritable, {
+					_es: es,
+					_executables: [],
+					_byName: {},
+					_executed: []
+				});
+				
+				if( array ) this.append.apply( this, array );
+				
+				return executableGroup;
+			};
+			
 		
 		
 		// ### Selectors
@@ -757,7 +1016,8 @@ var esEngine = setProto( ESProto, function() {
 				disposeEntity: disposeEntity,
 				componentCreator: componentCreator,
 				cLink: cLink,
-				system: system,
+				system: System,
+				executableGroup: ExecutableGroup,
 				selector: Selector,
 				anySelector: anySelector,
 				bag: Bag

@@ -12,7 +12,9 @@ var
 	Object_proto_toString = Object_prototype.toString,
 	Object_keys = Object.keys,
 	Array_prototype = Array.prototype,
-	Array_proto_slice = Array_prototype.slice;
+	Array_proto_push = Array_prototype.push,
+	Array_proto_slice = Array_prototype.slice,
+	Array_proto_splice = Array_prototype.splice;
 
 
 // Simple utility functions:

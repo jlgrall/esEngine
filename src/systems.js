@@ -58,3 +58,20 @@ var
 	};
 
 Object_freeze( SystemProto );
+
+
+var 
+	// Prototype for all systemGroup:
+	ExecutableGroupProto = {
+		execute: function() {
+			var executed = this._executed;
+			var nbExecuted = executed.length;
+			for( var i = 0; i < nbExecuted; i++ ) {
+				var executable = executed[i].executable;
+				executable.execute.apply( executable, arguments );
+			}
+			return this;
+		}
+	};
+
+Object_freeze( ExecutableGroupProto );
